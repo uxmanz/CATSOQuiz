@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade 2 Math Quiz Generator</title>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 30px;
+        color: #222;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .buttons {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    button {
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: none;
+        background-color: #007BFF;
+        color: white;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    .question {
+        margin-bottom: 40px;
+        page-break-inside: avoid;
+    }
+
+    .working {
+        margin-top: 5px;
+        height: 30px;
+        border-bottom: 1px solid #ccc;
+        width: 100%;
+    }
+
+    .answer {
+        margin-top: 5px;
+        height: 30px;
+        border-bottom: 1px solid #ccc;
+        width: 60%;
+    }
+
+    @media print {
+        button, .buttons {
+            display: none;
+        }
+        body {
+            margin: 20px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<h1>Grade 2 Math Quiz</h1>
+
+<div class="buttons">
+    <button onclick="generateQuiz()">Generate Quiz</button>
+    <button onclick="window.print()">Print Quiz</button>
+</div>
+
+<div id="quizContainer"></div>
+
+<script>
+const templates = [
+    name => `${name} has {a} pencils. Her brother has {b} pencils. How many more pencils does ${name} have than her brother?`,
+    () => `There are {a} apples in one basket and {b} in another. How many more apples are there in the second basket?`,
+    () => `A class planted {a} flower seeds. Only {b} grew into plants. How many fewer plants grew than the seeds planted?`,
+    name => `${name} collected {a} stamps last month and {b} this month. How many more stamps did ${name} collect this month?`,
+    () => `There were {a} birds on the tree. {b} flew away. How many are left on the tree now?`,
+    () => `A shop sold {a} toy cars on Monday and {b} on Tuesday. On which day did it sell more, and how many more were sold?`,
+    name => `${name} had {a} marbles. He gave {b} to his friend. How many marbles does ${name} have now?`,
+    () => `There were {a} red balloons and {b} blue balloons at a fair. How many more blue balloons were there than red ones?`,
+    () => `There were {a} mangoes in a shop. The shopkeeper sold {b}. How many mangoes are left now?`,
+    () => `A classroom has {a} boys and {b} girls. How many more girls than boys are there in the class?`,
+    () => `There were {a} books in the library. The teacher brought {b} more. How many books are there now altogether?`,
+    () => `Ali collected {a} seashells. His friend Zoya collected {b} fewer seashells. How many seashells did Zoya collect?`,
+    () => `A farmer had {a} hens. {b} of them were sold. How many hens does he have left?`,
+    () => `The first basket has {a} oranges. The second has {b} oranges. How many more oranges does the second basket have?`,
+    () => `There were {a} pencils in a box. {b} were used by students. How many pencils are left in the box?`,
+    () => `A shopkeeper sold {a} toys in the morning and {b} in the evening. How many toys did he sell altogether that day?`
+];
+
+const names = ["Zara", "Ahmed", "Ali", "Sam", "Ayesha", "Hassan", "Fatima", "Omar"];
+
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function pickRandom(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
+function generateQuestion() {
+    const template = pickRandom(templates);
+    const name = pickRandom(names);
+    let a = randomInt(30, 200);
+    let b = randomInt(20, a - 5); // ensures positive difference
+    let text = typeof template === "function" ? template(name) : template;
+    text = text.replace("{a}", a).replace("{b}", b);
+    return text;
+}
+
+function generateQuiz() {
+    const quizDiv = document.getElementById("quizContainer");
+    quizDiv.innerHTML = "";
+    for (let i = 1; i <= 20; i++) {
+        const q = document.createElement("div");
+        q.className = "question";
+        q.innerHTML = `
+            <b>${i}. ${generateQuestion()}</b><br><br>
+            Working space: <div class="working"></div><br>
+            Answer: <div class="answer"></div>
+        `;
+        quizDiv.appendChild(q);
+    }
+}
+</script>
+
+</body>
+</html>

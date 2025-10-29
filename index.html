@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Quiz Fun Zone</title>
+<style>
+  body {
+    font-family: "Comic Sans MS", "Poppins", sans-serif;
+    background: linear-gradient(135deg, #FFDEE9, #B5FFFC);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+  header {
+    background-color: #ffb703;
+    padding: 20px;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+  }
+  h1 {
+    margin: 0;
+    font-size: 2.2em;
+    color: #023047;
+  }
+  p {
+    font-size: 1.1em;
+    color: #333;
+  }
+  .quiz-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 30px auto;
+    max-width: 900px;
+    gap: 20px;
+  }
+  .quiz-card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    width: 180px;
+    height: 180px;
+    text-align: center;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .quiz-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  }
+  .quiz-card h2 {
+    margin-top: 15px;
+    color: #219ebc;
+  }
+  .quiz-card img {
+    width: 70px;
+    height: 70px;
+  }
+  footer {
+    margin-top: 40px;
+    background: #ffb703;
+    padding: 15px;
+    color: #023047;
+  }
+  @media (max-width: 600px) {
+    .quiz-card {
+      width: 150px;
+      height: 150px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Welcome to Math Quiz For CATSO 🎯</h1>
+  <p>Choose a quiz to start your math adventure!</p>
+</header>
+
+<div class="quiz-container">
+  <a href="SibelCatso.html" class="quiz-card">
+    <img src="https://img.icons8.com/color/96/plus--v1.png" alt="CATSO 30 Questions">
+    <h2>CATSO 30 Questions</h2>
+  </a>
+
+  <a href="SibelCatsoStatic.html" class="quiz-card">
+    <img src="https://img.icons8.com/color/96/plus--v1.png" alt="CATSO V2">
+    <h2>CATSO V2 Questions</h2>
+  </a>
+
+  <a href="SibelMathsQuiz.html" class="quiz-card">
+    <img src="https://img.icons8.com/color/96/plus--v1.png" alt="Printable Math Quiz Short Space">
+    <h2>Printable Math Quiz Short Space</h2>
+  </a>
+
+  <a href="SibelMathsQuizV1.html" class="quiz-card">
+    <img src="https://img.icons8.com/color/96/plus--v1.png" alt="Printable Math Quiz Long Space">
+    <h2>Printable Math Quiz Long Space</h2>
+  </a>
+</div>
+
+<footer>
+  © 2025 Math Quiz by Sibel Usman | Created with ❤️ for Kids
+</footer>
+
+</body>
+</html>
