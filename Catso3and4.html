@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CATSO 3 and4 Grade Maths Exam Quiz</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #5a67d8;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .question {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            color: #5a67d8;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .question-text {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .option {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #cbd5e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+        
+        .option:hover:not(.disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+        
+        .option.selected {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+        }
+        
+        .option.wrong {
+            background: #f56565;
+            color: white;
+            border-color: #f56565;
+        }
+        
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .result.correct {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .result.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        #submitBtn {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 40px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #submitBtn:hover {
+            background: #38a169;
+            transform: scale(1.05);
+        }
+        
+        #scoreDisplay {
+            text-align: center;
+            font-size: 2em;
+            color: #5a67d8;
+            margin-top: 30px;
+            padding: 20px;
+            background: #e6fffa;
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .score-text {
+            font-size: 0.6em;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 CATSO 3 and 4 Grade Maths Exam Quiz 🎯</h1>
+        <div id="quizContainer"></div>
+        <button id="submitBtn" onclick="calculateScore()">Submit Quiz</button>
+        <div id="scoreDisplay"></div>
+    </div>
+
+    <script>
+        // All questions data
+        const allQuestions = [
+  { q: "The smallest 3-digit number is:", options: ["111", "100", "101", "110"], answer: "100" },
+  { q: "The number that comes just before 200 is:", options: ["199", "198", "201", "210"], answer: "199" },
+  { q: "A shape with three sides is called:", options: ["Square", "Triangle", "Rectangle", "Circle"], answer: "Triangle" },
+  { q: "The value of 10 x 0 is:", options: ["0", "1", "10", "100"], answer: "0" },
+  { q: "Which number is even?", options: ["11", "8", "15", "21"], answer: "8" },
+  { q: "The number of days in a week is:", options: ["5", "6", "7", "8"], answer: "7" },
+  { q: "A figure with four equal sides and four right angles is:", options: ["Rectangle", "Square", "Rhombus", "Trapezium"], answer: "Square" },
+  { q: "Which number is greatest?", options: ["75", "85", "65", "55"], answer: "85" },
+  { q: "The shape of a ball is:", options: ["Cube", "Sphere", "Cylinder", "Cone"], answer: "Sphere" },
+  { q: "The value of 2 dozens is:", options: ["10", "24", "20", "12"], answer: "24" },
+  { q: "The largest 2-digit number is:", options: ["90", "98", "99", "100"], answer: "99" },
+  { q: "The shape of a traffic sign 'STOP' is:", options: ["Hexagon", "Octagon", "Pentagon", "Circle"], answer: "Octagon" },
+  { q: "Which is the correct symbol for 'is less than'?", options: ["<", ">", "=", "≥"], answer: "<" },
+  { q: "The number that comes after 349 is:", options: ["350", "351", "349", "340"], answer: "350" },
+  { q: "The face of a clock is in the shape of a:", options: ["Rectangle", "Circle", "Triangle", "Square"], answer: "Circle" },
+  { q: "A shape with all sides equal but no right angles is:", options: ["Square", "Rhombus", "Rectangle", "Kite"], answer: "Rhombus" },
+  { q: "Which number is smallest?", options: ["234", "243", "324", "123"], answer: "123" },
+  { q: "The number of minutes in one hour is:", options: ["100", "60", "90", "30"], answer: "60" },
+  { q: "A triangle with all sides equal is called:", options: ["Isosceles triangle", "Equilateral triangle", "Scalene triangle", "Right triangle"], answer: "Equilateral triangle" },
+  { q: "The shape of an ice cream cone is:", options: ["Sphere", "Cone", "Cylinder", "Cube"], answer: "Cone" },
+  { q: "Which number is odd?", options: ["12", "15", "20", "18"], answer: "15" },
+  { q: "The value of half a dozen is:", options: ["6", "12", "8", "10"], answer: "6" },
+  { q: "The number of corners in a rectangle is:", options: ["2", "4", "6", "8"], answer: "4" },
+  { q: "Which is the largest?", options: ["405", "450", "500", "480"], answer: "500" },
+  { q: "Which of these is a 3D shape?", options: ["Circle", "Square", "Cylinder", "Triangle"], answer: "Cylinder" },
+  { q: "The value of 5 tens is:", options: ["5", "50", "500", "5000"], answer: "50" },
+  { q: "A cube has how many faces?", options: ["4", "5", "6", "8"], answer: "6" },
+  { q: "The number of months in one year is:", options: ["10", "12", "11", "13"], answer: "12" },
+  { q: "Which fraction is equal to half?", options: ["2/3", "1/2", "1/3", "3/4"], answer: "1/2" },
+  { q: "Which number is between 150 and 160?", options: ["149", "161", "155", "140"], answer: "155" },
+  { q: "The day after Friday is:", options: ["Thursday", "Saturday", "Sunday", "Monday"], answer: "Saturday" },
+  { q: "Which is the largest single-digit number?", options: ["9", "8", "7", "6"], answer: "9" },
+  { q: "Which is smallest?", options: ["0.5", "0.25", "0.2", "0.3"], answer: "0.2" },
+  { q: "The number of sides in a pentagon is:", options: ["4", "6", "5", "7"], answer: "5" },
+  { q: "Which number is a multiple of 3?", options: ["8", "9", "10", "11"], answer: "9" },
+  { q: "The value of 1 century in years is:", options: ["50", "100", "10", "500"], answer: "100" },
+  { q: "Which is greater?", options: ["1000", "2000", "1500", "1999"], answer: "2000" },
+  { q: "The number of hours in one day is:", options: ["12", "18", "24", "36"], answer: "24" },
+  { q: "A triangle with one right angle is called:", options: ["Acute triangle", "Obtuse triangle", "Right triangle", "Scalene triangle"], answer: "Right triangle" },
+  { q: "The number of seconds in one minute is:", options: ["100", "60", "90", "30"], answer: "60" },
+  { q: "Which of these is a polygon?", options: ["Circle", "Hexagon", "Oval", "Sphere"], answer: "Hexagon" },
+  { q: "The smallest 4-digit number is:", options: ["1111", "100", "1000", "999"], answer: "1000" },
+  { q: "The value of 3 x 10 is:", options: ["30", "13", "300", "103"], answer: "30" },
+  { q: "Which number is the odd one out?", options: ["2", "4", "5", "8"], answer: "5" },
+  { q: "The shape of a box is:", options: ["Sphere", "Cuboid", "Cylinder", "Cone"], answer: "Cuboid" },
+  { q: "The number of equal parts in a quarter is:", options: ["2", "3", "4", "5"], answer: "4" },
+  { q: "Which number is a multiple of 5?", options: ["11", "12", "15", "16"], answer: "15" },
+  { q: "A rectangle has how many pairs of parallel sides?", options: ["1", "2", "3", "4"], answer: "2" },
+  { q: "Which number is greater?", options: ["0.7", "0.8", "0.75", "0.65"], answer: "0.8" },
+  { q: "The number of sides in a square is:", options: ["2", "4", "6", "8"], answer: "4" },
+  { q: "The value of 4 hundreds is:", options: ["4", "400", "40", "4000"], answer: "400" },
+  { q: "Which is smaller?", options: ["39", "49", "29", "59"], answer: "29" },
+  { q: "The shape of a coin is:", options: ["Square", "Triangle", "Circle", "Pentagon"], answer: "Circle" },
+  { q: "The largest two-digit odd number is:", options: ["97", "99", "95", "93"], answer: "99" },
+  { q: "A leap year comes after every:", options: ["2 years", "4 years", "5 years", "6 years"], answer: "4 years" },
+  { q: "The value of 50 - 25 is:", options: ["20", "25", "30", "15"], answer: "25" },
+  { q: "The number of days in February in a leap year is:", options: ["28", "29", "30", "27"], answer: "29" },
+  { q: "Which is the smallest number?", options: ["125", "115", "135", "145"], answer: "115" },
+  { q: "Which number is a multiple of 10?", options: ["15", "20", "25", "35"], answer: "20" },
+  { q: "The sum of 100 + 200 is:", options: ["300", "400", "500", "250"], answer: "300" },
+  { q: "The shape of a slice of pizza is:", options: ["Square", "Triangle", "Circle", "Rectangle"], answer: "Triangle" },
+  { q: "Which fraction is greater?", options: ["1/4", "1/2", "3/4", "2/4"], answer: "3/4" },
+  { q: "The number of equal sides in an equilateral triangle is:", options: ["2", "3", "1", "0"], answer: "3" },
+  { q: "Which number comes after 499?", options: ["500", "501", "498", "460"], answer: "500" },
+  { q: "The number of vertices in a cube is:", options: ["6", "5", "8", "12"], answer: "8" },
+  { q: "Which is the smallest two-digit number?", options: ["1", "9", "10", "11"], answer: "10" },
+  { q: "The number of hours in half a day is:", options: ["10", "12", "15", "20"], answer: "12" },
+  { q: "Which number is odd?", options: ["17", "20", "14", "8"], answer: "17" },
+  { q: "A rectangle has how many corners?", options: ["2", "4", "6", "8"], answer: "4" },
+  { q: "The number that comes after 799 is:", options: ["802", "800", "801", "810"], answer: "800" },
+  { q: "Which of these is a 3D shape?", options: ["Triangle", "Cone", "Square", "Pentagon"], answer: "Cone" },
+  { q: "The sum of 300 and 150 is:", options: ["500", "450", "400", "350"], answer: "450" },
+  { q: "Which fraction is the smallest?", options: ["3/4", "1/4", "1/2", "2/4"], answer: "1/4" },
+  { q: "The value of 7 tens is:", options: ["7", "70", "700", "77"], answer: "70" },
+  { q: "Which is the largest?", options: ["105", "150", "200", "175"], answer: "200" },
+  { q: "The number of equal sides in a square is:", options: ["2", "3", "4", "0"], answer: "4" },
+  { q: "Which number is a multiple of 4?", options: ["9", "12", "15", "20"], answer: "12" },
+  { q: "The shape of an eraser is usually:", options: ["Sphere", "Cuboid", "Cone", "Circle"], answer: "Cuboid" },
+  { q: "The value of 100 - 75 is:", options: ["25", "15", "20", "30"], answer: "25" },
+  { q: "The number of months in 2 years is:", options: ["12", "24", "18"], answer: "24" },
+  { q: "Which number is the greatest?", options: ["0.25", "0.5", "1.0"], answer: "1.0" },
+  { q: "A hexagon has how many sides?", options: ["5", "6", "7", "8"], answer: "6" },
+  { q: "The value of 9 hundreds is:", options: ["900", "90", "9", "9000"], answer: "900" },
+  { q: "Which shape has 2 long sides and 2 short sides?", options: ["Square", "Rectangle", "Rhombus", "Trapezium"], answer: "Rectangle" },
+  { q: "The number of equal parts in a half is:", options: ["2", "3", "4", "5"], answer: "2" },
+  { q: "Which number is smaller?", options: ["425", "415", "435", "445"], answer: "415" },
+  { q: "The number of days in January is:", options: ["31", "30", "28", "29"], answer: "31" },
+  { q: "Which is the largest one-digit odd number?", options: ["7", "9", "5", "3"], answer: "9" },
+  { q: "The shape of a can is:", options: ["Cube", "Cylinder", "Cone", "Sphere"], answer: "Cylinder" },
+  { q: "The value of 8 tens is:", options: ["8", "80", "800", "88"], answer: "80" },
+  { q: "Which number comes after 999?", options: ["1000", "1001", "1010"], answer: "1000" },
+  { q: "The smallest multiple of 2 is:", options: ["1", "0", "2", "4"], answer: "0" },
+  { q: "The sum of 50 and 25 is:", options: ["60", "75", "80", "85"], answer: "75" },
+  { q: "Which is greater?", options: ["0.6", "0.7", "0.5"], answer: "0.7" },
+  { q: "The number of sides in a rectangle is:", options: ["2", "4", "6", "8"], answer: "4" },
+  { q: "The shape of a dice is:", options: ["Cube", "Cylinder", "Cone", "Sphere"], answer: "Cube" },
+  { q: "Which number is a multiple of 6?", options: ["12", "18", "20", "22"], answer: "12" },
+  { q: "The number of hours in 3 days is:", options: ["48", "72", "60", "36"], answer: "72" },
+  { q: "Which is the smallest?", options: ["3/4", "2/4", "1/4", "4/4"], answer: "1/4" },
+  { q: "The number of edges in a cube is:", options: ["8", "12", "10", "6"], answer: "12" },
+  { q: "Which number is odd?", options: ["14", "20", "15", "8"], answer: "15" },
+  { q: "The value of 2 quarters is:", options: ["1/2", "1", "2", "3/4"], answer: "1/2" },
+  { q: "Which shape has all sides equal and all angles equal?", options: ["Rectangle", "Square", "Rhombus", "Trapezium"], answer: "Square" },
+  { q: "The number of weeks in 14 days is:", options: ["3", "2", "4", "5"], answer: "2" },
+  { q: "Ali has 24 candies. He shares them equally among 6 friends. How many candies does each friend get?", options: ["3", "4", "6", "8"], answer: "4" },
+  { q: "A clock shows 3:00. What angle is between the hands?", options: ["30°", "90°", "120°", "150°"], answer: "90°" },
+  { q: "A box has 42 pencils. Each packet holds 7 pencils. How many packets are there?", options: ["5", "6", "7", "8"], answer: "6" },
+  { q: "A farmer has 35 eggs. He puts them in trays of 5 each. How many trays does he need?", options: ["5", "7", "9", "10"], answer: "7" },
+  { q: "The perimeter of a square is 20 cm. What is the length of one side?", options: ["3 cm", "5 cm", "6 cm", "7 cm"], answer: "5 cm" },
+  { q: "A bus leaves at 9:15 a.m. and reaches at 10:00 a.m. How long is the journey?", options: ["35 min", "45 min", "50 min", "1 hr"], answer: "45 min" },
+  { q: "How many sides does a hexagon have?", options: ["5", "6", "7", "8"], answer: "6" },
+  { q: "A basket has 36 apples. Half are eaten. How many are left?", options: ["12", "14", "18", "20"], answer: "18" },
+  { q: "The sum of 25 and 37 is:", options: ["52", "62", "64", "66"], answer: "62" },
+  { q: "Which shape has 4 equal sides and 4 equal corners?", options: ["Rectangle", "Square", "Triangle", "Circle"], answer: "Square" },
+  { q: "A box has 100 balls. Half are red. How many red balls?", options: ["25", "30", "50", "60"], answer: "50" },
+  { q: "A car moves 10 km in 1 hour. How far in 4 hours?", options: ["20 km", "40 km", "50 km", "60 km"], answer: "40 km" },
+  { q: "The table has 4 legs. How many legs do 6 tables have?", options: ["18", "24", "28", "32"], answer: "24" },
+  { q: "A pizza is cut into 8 slices. Ali eats 3. What fraction is eaten?", options: ["2/8", "4/8", "3/8", "5/8"], answer: "3/8" },
+  { q: "The perimeter of a rectangle is 30 cm. If length = 10 cm, width is:", options: ["4 cm", "5 cm", "6 cm", "7 cm"], answer: "5 cm" },
+  { q: "How many minutes are in 2 hours?", options: ["90", "120", "150", "180"], answer: "120" },
+  { q: "A triangle has angles 40° and 60°. The third angle is:", options: ["70°", "80°", "90°", "100°"], answer: "80°" },
+  { q: "A basket has 18 bananas. Each child gets 3. How many children get bananas?", options: ["4", "6", "8", "9"], answer: "6" },
+  { q: "Which number is even?", options: ["13", "14", "15", "17"], answer: "14" },
+  { q: "A box has 64 cubes arranged in 8 equal rows. How many cubes in each row?", options: ["6", "8", "10", "12"], answer: "8" }
+];
+
+
+        let selectedQuestions = [];
+        let answeredQuestions = new Set();
+        let score = 0;
+
+        // Shuffle array and get 30 random questions
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled.slice(0, 30);
+        }
+
+        // Initialize quiz
+        function initializeQuiz() {
+            selectedQuestions = shuffleArray(allQuestions);
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+
+            selectedQuestions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.id = `question-${index}`;
+
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.textContent = `Question ${index + 1}`;
+
+                const questionText = document.createElement('div');
+                questionText.className = 'question-text';
+                questionText.textContent = question.q;
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+
+                question.options.forEach((option, optionIndex) => {
+                    const optionBtn = document.createElement('button');
+                    optionBtn.className = 'option';
+                    optionBtn.textContent = `${String.fromCharCode(65 + optionIndex)}) ${option}`;
+                    optionBtn.onclick = () => selectAnswer(index, option, optionBtn);
+                    optionsDiv.appendChild(optionBtn);
+                });
+
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result';
+                resultDiv.id = `result-${index}`;
+                resultDiv.style.display = 'none';
+
+                questionDiv.appendChild(questionNumber);
+                questionDiv.appendChild(questionText);
+                questionDiv.appendChild(optionsDiv);
+                questionDiv.appendChild(resultDiv);
+                container.appendChild(questionDiv);
+            });
+        }
+
+        // Handle answer selection
+        function selectAnswer(questionIndex, selectedAnswer, buttonElement) {
+            if (answeredQuestions.has(questionIndex)) return;
+
+            answeredQuestions.add(questionIndex);
+            const question = selectedQuestions[questionIndex];
+            const options = buttonElement.parentElement.querySelectorAll('.option');
+            const resultDiv = document.getElementById(`result-${questionIndex}`);
+
+            // Disable all options for this question
+            options.forEach(option => {
+                option.classList.add('disabled');
+                option.onclick = null;
+            });
+
+            // Show correct/incorrect styling
+            if (selectedAnswer === question.answer) {
+                buttonElement.classList.add('selected');
+                resultDiv.textContent = '✅ Correct!';
+                resultDiv.className = 'result correct';
+                score++;
+            } else {
+                buttonElement.classList.add('wrong');
+                resultDiv.textContent = `❌ Incorrect. Correct answer: ${question.answer}`;
+                resultDiv.className = 'result incorrect';
+                
+                // Highlight correct answer
+                options.forEach(option => {
+                    if (option.textContent.includes(question.answer)) {
+                        option.classList.add('selected');
+                    }
+                });
+            }
+
+            resultDiv.style.display = 'block';
+        }
+
+        // Calculate and display score
+        function calculateScore() {
+            const submitBtn = document.getElementById('submitBtn');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            
+            submitBtn.style.display = 'none';
+            
+            let message = '';
+            let emoji = '';
+            
+            if (score === 30) {
+                message = 'Perfect Score!';
+                emoji = '🏆';
+            } else if (score >= 25) {
+                message = 'Excellent!';
+                emoji = '🌟';
+            } else if (score >= 20) {
+                message = 'Good Job!';
+                emoji = '👏';
+            } else if (score >= 15) {
+                message = 'Well Done!';
+                emoji = '👍';
+            } else {
+                message = 'Keep Practicing!';
+                emoji = '📚';
+            }
+            
+            scoreDisplay.innerHTML = `
+                <div style="font-size: 1.5em; margin-bottom: 10px;">${emoji} ${message}</div>
+                <div style="font-size: 2.5em; font-weight: bold; color: #48bb78;">${score}/30</div>
+                <div class="score-text">Score: ${Math.round((score/30)*100)}%</div>
+                <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 30px; background: #667eea; color: white; border: none; border-radius: 25px; font-size: 1.1em; cursor: pointer;">Try Again</button>
+            `;
+            scoreDisplay.style.display = 'block';
+        }
+
+        // Initialize quiz on page load
+        window.onload = initializeQuiz;
+    </script>
+</body>
+</html>
