@@ -1,9 +1,7 @@
----
-
 # 🎯 Math Quiz Fun Zone
 
 Welcome to **Math Quiz for CATSO exam**, a fun, interactive, and kid-friendly math quiz generator built using **HTML**, **CSS**, and **JavaScript**.
-It’s designed to help young learners practice basic math concepts like **CATSO 30 Questions**, **CATSO V2 Questions**, **Printable Math Quiz Short Space**, and **Printable Math Quiz Long Space** — some in a colorful, engaging way!
+It’s designed to help young learners practice basic math concepts like **CATSO 30 Questions**, **CATSO V2 Questions**, **Printable Math Quiz Short Space**, and **Printable Math Quiz Long Space** [...]  
 
 ---
 
@@ -27,10 +25,9 @@ It’s designed to help young learners practice basic math concepts like **CATSO
 
 ✅ Designed especially for **primary school students**
 
-✅ Added printable two-column quiz 
+✅ Added printable two-column quiz  
 
 ✅ Added printable randomize quiz
-
 
 ---
 
@@ -88,5 +85,4 @@ Icons provided by [Icons8](https://icons8.com).
 ## 📜 License
 
 This project is licensed under the **MIT License** — feel free to use, modify, and share!
-
 ---
