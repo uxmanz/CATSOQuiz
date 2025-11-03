@@ -71,6 +71,7 @@ Your site will be live at:
 ## 👩‍🏫 Perfect For
 
 * Grade 1–2 students
+* Grade 3-4 students
 * Parents and teachers looking for quick math practice
 * Self-learning at home or classroom
 * For Sibel
@@ -79,7 +80,7 @@ Your site will be live at:
 
 ## ❤️ Credits
 
-Created by **Usman Ashraf** for Sibel.
+Created by **Usman** for Sibel.
 Icons provided by [Icons8](https://icons8.com).
 
 ---
