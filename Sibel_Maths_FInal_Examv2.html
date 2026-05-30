@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade 2 Math Word Problem Trainer</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f4f6f8;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+.controls {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 8px 14px;
+    margin: 4px;
+    border: none;
+    border-radius: 6px;
+    background: #1976d2;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1259a5;
+}
+
+.question {
+    background: white;
+    padding: 15px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.hint {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    background: #fff7c2;
+    border-radius: 6px;
+}
+
+.answerBox {
+    margin-top: 10px;
+}
+
+.answerInput {
+    padding: 8px;
+    width: 120px;
+    font-size: 16px;
+}
+
+.correct {
+    background: #d8ffd8;
+    border: 2px solid green;
+}
+
+.incorrect {
+    background: #ffd6d6;
+    border: 2px solid red;
+}
+
+.resultBlock {
+    background: white;
+    padding: 15px;
+    margin-top: 15px;
+    border-left: 5px solid #d32f2f;
+    border-radius: 6px;
+}
+
+.good {
+    color: green;
+}
+
+.bad {
+    color: red;
+}
+
+.operation-group {
+    margin-top: 10px;
+}
+
+.operation-group label {
+    margin-right: 15px;
+}
+
+.scoreCard {
+    background: white;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.logic {
+    background: #f7f7f7;
+    padding: 10px;
+    margin-top: 8px;
+    border-radius: 4px;
+}
+
+.small {
+    color: #666;
+    font-size: 13px;
+}
+</style>
+</head>
+<body>
+
+<h1>Grade 2 Math Word Problem Trainer</h1>
+
+<div class="controls">
+    <button onclick="generateQuestions()">Generate New Set</button>
+    <button onclick="submitQuiz()">Submit Quiz</button>
+</div>
+
+<div id="questions"></div>
+
+<div id="results"></div>
+
+<script>
+
+let currentQuestions = [];
+
+function rand(min,max){
+    return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+function normalizeAnswer(value){
+    return parseFloat(
+        value
+            .toLowerCase()
+            .replace(/kg|g|litres|liters|litre|liter|l/gi,'')
+            .trim()
+    );
+}
+
+function createQuestion(obj){
+    obj.id = crypto.randomUUID();
+    return obj;
+}
+
+function additionQuestion(){
+
+    if(Math.random() < 0.5){
+
+        let cupcake = rand(100,300);
+        let more = rand(20,100);
+
+        return createQuestion({
+            operation:"+",
+            answer:cupcake+more,
+
+            question:`The mass of a cupcake is ${cupcake}g. A muffin is ${more}g heavier than the cupcake. What is the mass of the muffin?`,
+
+            hint:"Look for words like: more, heavier, greater, bigger.",
+
+            explanation:[
+                `Cupcake = ${cupcake}g`,
+                `Muffin is ${more}g heavier`,
+                `Heavier means we need a larger amount`,
+                `${cupcake} + ${more} = ${cupcake+more}`
+            ]
+        });
+    }
+
+    let apple = rand(50,120);
+    let lighter = rand(50,180);
+
+    return createQuestion({
+        operation:"+",
+        answer:apple+lighter,
+
+        question:`An apple has a mass of ${apple}g. It is ${lighter}g lighter than a grapefruit. What is the mass of the grapefruit?`,
+
+        hint:"One item is lighter than another. Which item must be larger?",
+
+        explanation:[
+            `Apple = ${apple}g`,
+            `Apple is ${lighter}g lighter`,
+            `The grapefruit must be heavier`,
+            `${apple} + ${lighter} = ${apple+lighter}`
+        ]
+    });
+}
+
+function subtractionQuestion(){
+
+    if(Math.random() < 0.5){
+
+        let capacity = rand(30,60);
+        let current = rand(1,capacity-5);
+
+        return createQuestion({
+            operation:"-",
+            answer:capacity-current,
+
+            question:`A petrol tank can contain ${capacity}L of petrol. It currently has ${current}L. How many more litres are needed to fill the tank?`,
+
+            hint:"Look for: difference, how many more, how much left.",
+
+            explanation:[
+                `Tank capacity = ${capacity}L`,
+                `Current petrol = ${current}L`,
+                `Need to find the difference`,
+                `${capacity} - ${current} = ${capacity-current}`
+            ]
+        });
+    }
+
+    let cucumber = rand(180,300);
+    let carrot = rand(80,cucumber-20);
+
+    return createQuestion({
+        operation:"-",
+        answer:cucumber-carrot,
+
+        question:`A cucumber has a mass of ${cucumber}g. A carrot has a mass of ${carrot}g. How much heavier is the cucumber?`,
+
+        hint:"Compare two amounts and find the difference.",
+
+        explanation:[
+            `Cucumber = ${cucumber}g`,
+            `Carrot = ${carrot}g`,
+            `The question asks how much heavier`,
+            `${cucumber} - ${carrot} = ${cucumber-carrot}`
+        ]
+    });
+}
+
+function multiplicationQuestion(){
+
+    if(Math.random() < 0.5){
+
+        let ducks = rand(2,10);
+        let mass = rand(2,6);
+
+        return createQuestion({
+            operation:"×",
+            answer:ducks*mass,
+
+            question:`There are ${ducks} ducks. Each duck has a mass of ${mass}kg. What is the total mass of all the ducks?`,
+
+            hint:"Notice the word EACH. Are there equal groups?",
+
+            explanation:[
+                `${ducks} ducks`,
+                `Each duck = ${mass}kg`,
+                `Equal groups means multiplication`,
+                `${ducks} × ${mass} = ${ducks*mass}`
+            ]
+        });
+    }
+
+    let bottles = rand(2,10);
+    let litres = rand(2,5);
+
+    return createQuestion({
+        operation:"×",
+        answer:bottles*litres,
+
+        question:`A mother buys ${bottles} bottles of liquid soap. Each bottle contains ${litres}L. How many litres does she buy altogether?`,
+
+        hint:"Several equal groups are being combined.",
+
+        explanation:[
+            `${bottles} bottles`,
+            `${litres}L in each bottle`,
+            `Equal groups means multiplication`,
+            `${bottles} × ${litres} = ${bottles*litres}`
+        ]
+    });
+}
+
+function divisionQuestion(){
+
+    if(Math.random() < 0.5){
+
+        let groups = rand(2,5);
+        let each = rand(2,6);
+        let total = groups * each;
+
+        return createQuestion({
+            operation:"÷",
+            answer:each,
+
+            question:`The total mass of ${groups} watermelons is ${total}kg. Each watermelon has the same mass. What is the mass of each watermelon?`,
+
+            hint:"The total is shared equally.",
+
+            explanation:[
+                `Total = ${total}kg`,
+                `${groups} equal watermelons`,
+                `Sharing equally means division`,
+                `${total} ÷ ${groups} = ${each}`
+            ]
+        });
+    }
+
+    let bottles = rand(2,5);
+    let each = rand(2,6);
+    let total = bottles*each;
+
+    return createQuestion({
+        operation:"÷",
+        answer:each,
+
+        question:`Weining prepares ${total}L of fruit punch. He pours it equally into ${bottles} bottles. How much punch is in each bottle?`,
+
+        hint:"Look for words such as equally, shared, split.",
+
+        explanation:[
+            `Total punch = ${total}L`,
+            `${bottles} bottles`,
+            `Equally means division`,
+            `${total} ÷ ${bottles} = ${each}`
+        ]
+    });
+}
+
+function randomQuestion(){
+
+    const generators = [
+        additionQuestion,
+        subtractionQuestion,
+        multiplicationQuestion,
+        divisionQuestion
+    ];
+
+    return generators[rand(0,generators.length-1)]();
+}
+
+function toggleHint(btn){
+    const hint = btn.parentElement.querySelector('.hint');
+    hint.style.display = hint.style.display === 'block'
+        ? 'none'
+        : 'block';
+}
+
+function generateQuestions(){
+
+    currentQuestions = [];
+
+    const container = document.getElementById('questions');
+    const results = document.getElementById('results');
+
+    container.innerHTML = '';
+    results.innerHTML = '';
+
+    for(let i=0;i<10;i++){
+
+        const q = randomQuestion();
+        currentQuestions.push(q);
+
+        const div = document.createElement('div');
+        div.className = 'question';
+
+        div.innerHTML = `
+            <h3>Question ${i+1}</h3>
+
+            <p>${q.question}</p>
+
+            <button onclick="toggleHint(this)">Hint</button>
+
+            <div class="hint">
+                ${q.hint}
+            </div>
+
+            <div class="operation-group">
+                <strong>Choose the operation:</strong><br>
+
+                <label>
+                    <input type="radio" name="op_${q.id}" value="+">
+                    +
+                </label>
+
+                <label>
+                    <input type="radio" name="op_${q.id}" value="-">
+                    -
+                </label>
+
+                <label>
+                    <input type="radio" name="op_${q.id}" value="×">
+                    ×
+                </label>
+
+                <label>
+                    <input type="radio" name="op_${q.id}" value="÷">
+                    ÷
+                </label>
+            </div>
+
+            <div class="answerBox">
+                <input
+                    class="answerInput"
+                    id="answer_${q.id}"
+                    placeholder="Answer">
+            </div>
+        `;
+
+        container.appendChild(div);
+
+        const input = div.querySelector('.answerInput');
+
+        input.addEventListener('input', ()=>{
+
+            const value = normalizeAnswer(input.value);
+
+            if(input.value.trim() === ''){
+                input.classList.remove('correct','incorrect');
+                return;
+            }
+
+            if(value === q.answer){
+                input.classList.add('correct');
+                input.classList.remove('incorrect');
+            }else{
+                input.classList.add('incorrect');
+                input.classList.remove('correct');
+            }
+        });
+    }
+}
+
+function submitQuiz(){
+
+    let answerScore = 0;
+    let operationScore = 0;
+
+    let html = '';
+
+    currentQuestions.forEach((q,index)=>{
+
+        const answerInput =
+            document.getElementById(`answer_${q.id}`);
+
+        const answer =
+            normalizeAnswer(answerInput.value);
+
+        const answerCorrect =
+            answer === q.answer;
+
+        if(answerCorrect)
+            answerScore++;
+
+        const selected =
+            document.querySelector(
+                `input[name="op_${q.id}"]:checked`
+            );
+
+        const opCorrect =
+            selected &&
+            selected.value === q.operation;
+
+        if(opCorrect)
+            operationScore++;
+
+        if(!answerCorrect || !opCorrect){
+
+            html += `
+            <div class="resultBlock">
+
+                <h3>Question ${index+1}</h3>
+
+                <div class="${answerCorrect ? 'good':'bad'}">
+                    Answer:
+                    ${answerCorrect ? 'Correct' : 'Incorrect'}
+                </div>
+
+                <div class="${opCorrect ? 'good':'bad'}">
+                    Operation:
+                    ${opCorrect ? 'Correct' : 'Incorrect'}
+                </div>
+
+                <p><strong>Correct Operation:</strong>
+                ${q.operation}</p>
+
+                <p><strong>Correct Answer:</strong>
+                ${q.answer}</p>
+
+                <p><strong>Clue:</strong>
+                ${q.hint}</p>
+
+                <div class="logic">
+                    <strong>How to solve:</strong>
+                    <ol>
+                        ${q.explanation.map(x => `<li>${x}</li>`).join('')}
+                    </ol>
+                </div>
+
+            </div>`;
+        }
+
+    });
+
+    const total = currentQuestions.length;
+
+    document.getElementById('results').innerHTML = `
+
+        <div class="scoreCard">
+
+            <h2>Results</h2>
+
+            <p>
+                Operation Score:
+                <strong>${operationScore}/${total}</strong>
+            </p>
+
+            <p>
+                Answer Score:
+                <strong>${answerScore}/${total}</strong>
+            </p>
+
+            <p>
+                Overall:
+                <strong>${operationScore + answerScore}/${total*2}</strong>
+            </p>
+
+            <div class="small">
+                The operation score measures whether the student
+                correctly identified +, -, ×, or ÷ before solving.
+            </div>
+
+        </div>
+
+        ${html}
+    `;
+
+    window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth'
+    });
+}
+
+generateQuestions();
+
+</script>
+
+</body>
+</html>
