@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CATSO English Exam Quiz</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #5a67d8;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .question {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            color: #5a67d8;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .question-text {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .option {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #cbd5e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+        
+        .option:hover:not(.disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+        
+        .option.selected {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+        }
+        
+        .option.wrong {
+            background: #f56565;
+            color: white;
+            border-color: #f56565;
+        }
+        
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .result.correct {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .result.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        #submitBtn {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 40px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #submitBtn:hover {
+            background: #38a169;
+            transform: scale(1.05);
+        }
+        
+        #scoreDisplay {
+            text-align: center;
+            font-size: 2em;
+            color: #5a67d8;
+            margin-top: 30px;
+            padding: 20px;
+            background: #e6fffa;
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .score-text {
+            font-size: 0.6em;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 CATSO English Exam Quiz 3 Class 🎯</h1>
+        <div id="quizContainer"></div>
+        <button id="submitBtn" onclick="calculateScore()">Submit Quiz</button>
+        <div id="scoreDisplay"></div>
+    </div>
+
+    <script>
+        // All questions data
+    const allQuestions = [
+    { q: "If the subject is singular, the verb will also be:", options: ["singular", "plural", "none of them"], answer: "singular" },
+    { q: "If the subject is plural, the verb will also be:", options: ["plural", "singular", "none of them"], answer: "plural" },
+    { q: "Which sentence has a singular subject and singular verb?", options: ["The boy runs.", "The boys run.", "The boys runs."], answer: "The boy runs." },
+    { q: "Which sentence has a plural subject and plural verb?", options: ["The girls plays.", "The girls play.", "The girl play."], answer: "The girls play." },
+    { q: "Choose the correct verb: The cat ______ on the mat.", options: ["sit", "sits", "sitting"], answer: "sits" },
+    { q: "Choose the correct verb: The boys ______ football.", options: ["plays", "play", "playing"], answer: "play" },
+    { q: "Choose the correct verb: She ______ to school every day.", options: ["walk", "walks", "walking"], answer: "walks" },
+    { q: "Choose the correct verb: They ______ in the park.", options: ["plays", "play", "playing"], answer: "play" },
+    { q: "Choose the correct verb: My mother ______ delicious food.", options: ["cook", "cooks", "cooking"], answer: "cooks" },
+    { q: "Choose the correct verb: The children ______ loudly.", options: ["laughs", "laugh", "laughing"], answer: "laugh" },
+
+    { q: "I saw ______ elephant at the zoo.", options: ["a", "an", "the"], answer: "an" },
+    { q: "She has ______ red bag.", options: ["a", "an", "the"], answer: "a" },
+    { q: "He ate ______ apple.", options: ["a", "an", "the"], answer: "an" },
+    { q: "I met ______ boy in the store.", options: ["a", "the", "an"], answer: "a" },
+    { q: "______ boy I met was badly injured.", options: ["The", "An", "No article required"], answer: "The" },
+    { q: "She is wearing ______ uniform.", options: ["an", "a", "none of these"], answer: "a" },
+    { q: "I waited for ______ hour.", options: ["an", "a", "the"], answer: "an" },
+    { q: "He bought ______ orange from the shop.", options: ["a", "an", "the"], answer: "an" },
+    { q: "There is ______ cat under the table.", options: ["a", "an", "none of these"], answer: "a" },
+    { q: "She found ______ old book.", options: ["a", "an", "the"], answer: "an" },
+    { q: "He wants to become ______ doctor.", options: ["a", "an", "the"], answer: "a" },
+    { q: "We saw ______ eagle in the sky.", options: ["a", "an", "the"], answer: "an" },
+    { q: "I have ______ pencil in my bag.", options: ["a", "an", "the"], answer: "a" },
+    { q: "She ate ______ egg for breakfast.", options: ["a", "an", "the"], answer: "an" },
+    { q: "He is ______ honest boy.", options: ["a", "an", "the"], answer: "an" },
+    { q: "We visited ______ museum yesterday.", options: ["a", "an", "the"], answer: "a" },
+    { q: "______ sun rises in the east.", options: ["A", "An", "The"], answer: "The" },
+    { q: "______ moon shines at night.", options: ["A", "An", "The"], answer: "The" },
+    { q: "She saw ______ beautiful bird.", options: ["a", "an", "the"], answer: "a" },
+    { q: "He is eating ______ banana.", options: ["a", "an", "the"], answer: "a" },
+
+    { q: "In grammar, describing words are known as:", options: ["adjectives", "adverbs", "verbs"], answer: "adjectives" },
+    { q: "Which word is an adjective?", options: ["hot", "cup", "drink"], answer: "hot" },
+    { q: "Choose the describing word: The ______ dog barked.", options: ["big", "run", "dog"], answer: "big" },
+    { q: "Choose the describing word: She wore a ______ dress.", options: ["beautiful", "wear", "dress"], answer: "beautiful" },
+    { q: "Choose the describing word: It was a ______ day.", options: ["sunny", "walk", "day"], answer: "sunny" },
+    { q: "Choose the describing word: He has a ______ car.", options: ["new", "drive", "car"], answer: "new" },
+    { q: "Choose the describing word: The soup is ______.", options: ["hot", "eat", "soup"], answer: "hot" },
+    { q: "Choose the describing word: The elephant is ______.", options: ["large", "walk", "elephant"], answer: "large" },
+    { q: "Choose the describing word: She has a ______ voice.", options: ["soft", "sing", "voice"], answer: "soft" },
+    { q: "Choose the describing word: The box is ______.", options: ["heavy", "carry", "box"], answer: "heavy" },
+    { q: "Which word describes the flower?", options: ["beautiful", "grow", "flower"], answer: "beautiful" },
+    { q: "Which word describes the cake?", options: ["delicious", "eat", "cake"], answer: "delicious" },
+    { q: "Which word describes the road?", options: ["wide", "drive", "road"], answer: "wide" },
+    { q: "Which word describes the baby?", options: ["small", "sleep", "baby"], answer: "small" },
+    { q: "Which word describes the mountain?", options: ["high", "climb", "mountain"], answer: "high" },
+    { q: "Which word describes the water?", options: ["cold", "drink", "water"], answer: "cold" },
+    { q: "Which word describes the rabbit?", options: ["white", "hop", "rabbit"], answer: "white" },
+    { q: "Which word describes the house?", options: ["large", "live", "house"], answer: "large" },
+    { q: "Which word describes the book?", options: ["interesting", "read", "book"], answer: "interesting" },
+    { q: "Which word describes the weather?", options: ["pleasant", "change", "weather"], answer: "pleasant" },
+
+    { q: "Choose the correct word: ______ birds are flying in the sky.", options: ["small", "smart", "short"], answer: "small" },
+    { q: "There are ______ flowers in the garden.", options: ["many", "must", "much"], answer: "many" },
+    { q: "Choose the correct word: ______ breeze is blowing outside.", options: ["cool", "cup", "could"], answer: "cool" },
+    { q: "They were a ______ family.", options: ["happy", "hold", "tasty"], answer: "happy" },
+    { q: "Bela sat on the ______ bench.", options: ["hard", "none of these", "head"], answer: "hard" },
+    { q: "Today is my ______ day at school.", options: ["last", "both of these", "low"], answer: "last" },
+    { q: "The baby has ______ hands.", options: ["tiny", "run", "eat"], answer: "tiny" },
+    { q: "The elephant has ______ ears.", options: ["large", "jump", "eat"], answer: "large" },
+    { q: "The ice is ______.", options: ["cold", "run", "drink"], answer: "cold" },
+    { q: "The lion is a ______ animal.", options: ["strong", "walk", "eat"], answer: "strong" },
+    { q: "The pillow is very ______.", options: ["soft", "sleep", "pillow"], answer: "soft" },
+    { q: "The mango is ______.", options: ["sweet", "eat", "mango"], answer: "sweet" },
+    { q: "The road is ______.", options: ["long", "walk", "road"], answer: "long" },
+    { q: "The water in the pool is ______.", options: ["clean", "swim", "pool"], answer: "clean" },
+    { q: "The rabbit has ______ fur.", options: ["soft", "hop", "rabbit"], answer: "soft" },
+
+    { q: "Choose the suitable word: The sun was shining ______.", options: ["brightly", "brightening", "bright"], answer: "brightly" },
+    { q: "The children were sitting ______.", options: ["quietly", "loudly", "quiet"], answer: "quietly" },
+    { q: "The girl sang ______.", options: ["beautifully", "beautiful", "beauty"], answer: "beautifully" },
+    { q: "The boy ran ______.", options: ["quickly", "quick", "quickness"], answer: "quickly" },
+    { q: "The teacher spoke ______.", options: ["clearly", "clear", "clearness"], answer: "clearly" },
+    { q: "The baby slept ______.", options: ["peacefully", "peaceful", "peace"], answer: "peacefully" },
+    { q: "The dog barked ______.", options: ["loudly", "loud", "loudness"], answer: "loudly" },
+    { q: "The turtle walked ______.", options: ["slowly", "slow", "slowness"], answer: "slowly" },
+    { q: "The students listened ______.", options: ["carefully", "careful", "care"], answer: "carefully" },
+    { q: "The bird flew ______.", options: ["quickly", "quick", "quickness"], answer: "quickly" },
+    { q: "The boy answered the question ______.", options: ["correctly", "correct", "correction"], answer: "correctly" },
+    { q: "She completed her work ______.", options: ["neatly", "neat", "neatness"], answer: "neatly" },
+    { q: "He opened the door ______.", options: ["slowly", "slow", "slowness"], answer: "slowly" },
+    { q: "The children played ______.", options: ["happily", "happy", "happiness"], answer: "happily" },
+    { q: "The horse ran ______.", options: ["fast", "fastly", "fasterly"], answer: "fast" },
+    { q: "The girl danced ______.", options: ["gracefully", "graceful", "grace"], answer: "gracefully" },
+    { q: "The teacher explained the lesson ______.", options: ["carefully", "careful", "care"], answer: "carefully" },
+    { q: "The rain fell ______.", options: ["heavily", "heavy", "heaviness"], answer: "heavily" },
+    { q: "The baby cried ______.", options: ["loudly", "loud", "loudness"], answer: "loudly" },
+    { q: "The students worked ______.", options: ["quietly", "quiet", "quietness"], answer: "quietly" },
+
+    { q: "I reached home ______ because the train was delayed.", options: ["late", "soon", "early"], answer: "late" },
+    { q: "I did not go to school ______ as I was unwell.", options: ["yesterday", "tomorrow", "today"], answer: "yesterday" },
+    { q: "My grandpa goes for a walk ______ in the morning.", options: ["early", "soon", "late"], answer: "early" },
+    { q: "We will visit our grandmother ______.", options: ["tomorrow", "yesterday", "last week"], answer: "tomorrow" },
+    { q: "I finished my homework ______.", options: ["yesterday", "tomorrow", "next week"], answer: "yesterday" },
+    { q: "The bus arrived ______.", options: ["late", "tomorrow", "yesterday"], answer: "late" },
+    { q: "We are going to the park ______.", options: ["today", "yesterday", "last week"], answer: "today" },
+    { q: "He came to school ______.", options: ["early", "tomorrow", "yesterday"], answer: "early" },
+    { q: "She will complete the work ______.", options: ["tomorrow", "yesterday", "last night"], answer: "tomorrow" },
+    { q: "The train arrived ______ in the morning.", options: ["early", "tomorrow", "yesterday"], answer: "early" },
+
+    { q: "Choose the correct word: The bird is flying ______ the tree.", options: ["above", "happy", "quick"], answer: "above" },
+    { q: "The book is ______ the table.", options: ["on", "run", "happy"], answer: "on" },
+    { q: "The cat is hiding ______ the chair.", options: ["under", "beautiful", "quickly"], answer: "under" },
+    { q: "The children are playing ______ the park.", options: ["in", "happy", "loud"], answer: "in" },
+    { q: "The teacher is standing ______ the students.", options: ["near", "quick", "beautiful"], answer: "near" },
+    { q: "The ball is ______ the box.", options: ["inside", "tasty", "slow"], answer: "inside" },
+    { q: "The dog is sitting ______ the door.", options: ["beside", "happy", "loudly"], answer: "beside" },
+    { q: "The school is ______ the park.", options: ["near", "quickly", "beautiful"], answer: "near" },
+    { q: "The bird flew ______ the house.", options: ["over", "soft", "quietly"], answer: "over" },
+    { q: "The shoes are ______ the bed.", options: ["under", "happy", "brightly"], answer: "under" },
+
+    { q: "Choose the correct pronoun: ______ am going to school.", options: ["I", "He", "They"], answer: "I" },
+    { q: "Choose the correct pronoun: Sara is my friend. ______ is kind.", options: ["He", "She", "They"], answer: "She" },
+    { q: "Ali is playing. ______ is happy.", options: ["He", "She", "It"], answer: "He" },
+    { q: "The children are outside. ______ are playing.", options: ["He", "She", "They"], answer: "They" },
+    { q: "The dog is hungry. ______ needs food.", options: ["It", "He", "They"], answer: "It" },
+    { q: "My sister and I are students. ______ study together.", options: ["We", "They", "He"], answer: "We" },
+    { q: "Ahmed and Ali are brothers. ______ play together.", options: ["He", "They", "It"], answer: "They" },
+    { q: "This is my book. ______ is new.", options: ["It", "They", "We"], answer: "It" },
+    { q: "My mother is a teacher. ______ teaches English.", options: ["She", "He", "They"], answer: "She" },
+    { q: "My father is at work. ______ will come home later.", options: ["He", "She", "They"], answer: "He" },
+
+    { q: "Choose the correct word: I ______ a student.", options: ["am", "is", "are"], answer: "am" },
+    { q: "Choose the correct word: She ______ happy.", options: ["am", "is", "are"], answer: "is" },
+    { q: "Choose the correct word: They ______ friends.", options: ["am", "is", "are"], answer: "are" },
+    { q: "Choose the correct word: We ______ ready.", options: ["am", "is", "are"], answer: "are" },
+    { q: "Choose the correct word: He ______ my brother.", options: ["am", "is", "are"], answer: "is" },
+    { q: "Choose the correct word: You ______ very kind.", options: ["am", "is", "are"], answer: "are" },
+    { q: "Choose the correct word: It ______ a sunny day.", options: ["am", "is", "are"], answer: "is" },
+    { q: "Choose the correct word: The boys ______ playing.", options: ["am", "is", "are"], answer: "are" },
+    { q: "Choose the correct word: The girl ______ reading.", options: ["am", "is", "are"], answer: "is" },
+    { q: "Choose the correct word: I ______ ready for school.", options: ["am", "is", "are"], answer: "am" },
+
+    { q: "Choose the opposite of 'hot'.", options: ["cold", "warm", "big"], answer: "cold" },
+    { q: "Choose the opposite of 'big'.", options: ["large", "small", "tall"], answer: "small" },
+    { q: "Choose the opposite of 'fast'.", options: ["quick", "slow", "early"], answer: "slow" },
+    { q: "Choose the opposite of 'happy'.", options: ["sad", "kind", "nice"], answer: "sad" },
+    { q: "Choose the opposite of 'old'.", options: ["young", "large", "long"], answer: "young" },
+    { q: "Choose the opposite of 'up'.", options: ["down", "over", "near"], answer: "down" },
+    { q: "Choose the opposite of 'open'.", options: ["closed", "wide", "large"], answer: "closed" },
+    { q: "Choose the opposite of 'early'.", options: ["late", "soon", "fast"], answer: "late" },
+    { q: "Choose the opposite of 'clean'.", options: ["dirty", "bright", "soft"], answer: "dirty" },
+    { q: "Choose the opposite of 'light'.", options: ["dark", "bright", "white"], answer: "dark" },
+
+    { q: "Choose the word that means the same as 'happy'.", options: ["sad", "glad", "angry"], answer: "glad" },
+    { q: "Choose the word that means the same as 'big'.", options: ["small", "large", "short"], answer: "large" },
+    { q: "Choose the word that means the same as 'quick'.", options: ["slow", "fast", "late"], answer: "fast" },
+    { q: "Choose the word that means the same as 'smart'.", options: ["clever", "slow", "weak"], answer: "clever" },
+    { q: "Choose the word that means the same as 'small'.", options: ["tiny", "huge", "long"], answer: "tiny" },
+    { q: "Choose the word that means the same as 'beautiful'.", options: ["pretty", "ugly", "dirty"], answer: "pretty" },
+    { q: "Choose the word that means the same as 'angry'.", options: ["mad", "happy", "calm"], answer: "mad" },
+    { q: "Choose the word that means the same as 'begin'.", options: ["start", "finish", "stop"], answer: "start" },
+    { q: "Choose the word that means the same as 'finish'.", options: ["start", "end", "open"], answer: "end" },
+    { q: "Choose the word that means the same as 'silent'.", options: ["quiet", "loud", "fast"], answer: "quiet" },
+
+    { q: "Which word is a noun?", options: ["school", "quickly", "happy"], answer: "school" },
+    { q: "Which word is a verb?", options: ["run", "blue", "table"], answer: "run" },
+    { q: "Which word is an adjective?", options: ["beautiful", "sing", "teacher"], answer: "beautiful" },
+    { q: "Which word is an adverb?", options: ["slowly", "slow", "car"], answer: "slowly" },
+    { q: "Which word is a noun?", options: ["garden", "jump", "quickly"], answer: "garden" },
+    { q: "Which word is a verb?", options: ["write", "book", "blue"], answer: "write" },
+    { q: "Which word is an adjective?", options: ["tall", "run", "school"], answer: "tall" },
+    { q: "Which word is an adverb?", options: ["carefully", "careful", "student"], answer: "carefully" },
+    { q: "Which word is a noun?", options: ["teacher", "teach", "quickly"], answer: "teacher" },
+    { q: "Which word is a verb?", options: ["dance", "happy", "garden"], answer: "dance" },
+
+    { q: "Choose the correctly spelled word.", options: ["school", "skool", "schoole"], answer: "school" },
+    { q: "Choose the correctly spelled word.", options: ["beautiful", "beutiful", "beautifull"], answer: "beautiful" },
+    { q: "Choose the correctly spelled word.", options: ["friend", "freind", "frend"], answer: "friend" },
+    { q: "Choose the correctly spelled word.", options: ["because", "becaus", "becouse"], answer: "because" },
+    { q: "Choose the correctly spelled word.", options: ["morning", "moring", "mornning"], answer: "morning" },
+    { q: "Choose the correctly spelled word.", options: ["teacher", "techer", "teachar"], answer: "teacher" },
+    { q: "Choose the correctly spelled word.", options: ["family", "famly", "familey"], answer: "family" },
+    { q: "Choose the correctly spelled word.", options: ["garden", "gardin", "gardenn"], answer: "garden" },
+    { q: "Choose the correctly spelled word.", options: ["children", "childrens", "childern"], answer: "children" },
+    { q: "Choose the correctly spelled word.", options: ["yellow", "yelow", "yelllow"], answer: "yellow" },
+
+    { q: "Choose the correct plural of 'book'.", options: ["books", "bookes", "bookies"], answer: "books" },
+    { q: "Choose the correct plural of 'box'.", options: ["boxs", "boxes", "boxies"], answer: "boxes" },
+    { q: "Choose the correct plural of 'baby'.", options: ["babys", "babies", "babyes"], answer: "babies" },
+    { q: "Choose the correct plural of 'cat'.", options: ["cats", "cates", "caties"], answer: "cats" },
+    { q: "Choose the correct plural of 'bus'.", options: ["buss", "buses", "busies"], answer: "buses" },
+    { q: "Choose the correct plural of 'class'.", options: ["class", "classes", "classies"], answer: "classes" },
+    { q: "Choose the correct plural of 'dog'.", options: ["dogs", "doges", "dogies"], answer: "dogs" },
+    { q: "Choose the correct plural of 'dish'.", options: ["dishs", "dishes", "dishies"], answer: "dishes" },
+    { q: "Choose the correct plural of 'toy'.", options: ["toys", "toies", "toyes"], answer: "toys" },
+    { q: "Choose the correct plural of 'flower'.", options: ["flowers", "floweres", "floweries"], answer: "flowers" }
+];
+        let selectedQuestions = [];
+        let answeredQuestions = new Set();
+        let score = 0;
+
+        // Shuffle array and get 30 random questions
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled.slice(0, 30);
+        }
+
+        // Initialize quiz
+        function initializeQuiz() {
+            selectedQuestions = shuffleArray(allQuestions);
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+
+            selectedQuestions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.id = `question-${index}`;
+
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.textContent = `Question ${index + 1}`;
+
+                const questionText = document.createElement('div');
+                questionText.className = 'question-text';
+                questionText.textContent = question.q;
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+
+                question.options.forEach((option, optionIndex) => {
+                    const optionBtn = document.createElement('button');
+                    optionBtn.className = 'option';
+                    optionBtn.textContent = `${String.fromCharCode(65 + optionIndex)}) ${option}`;
+                    optionBtn.onclick = () => selectAnswer(index, option, optionBtn);
+                    optionsDiv.appendChild(optionBtn);
+                });
+
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result';
+                resultDiv.id = `result-${index}`;
+                resultDiv.style.display = 'none';
+
+                questionDiv.appendChild(questionNumber);
+                questionDiv.appendChild(questionText);
+                questionDiv.appendChild(optionsDiv);
+                questionDiv.appendChild(resultDiv);
+                container.appendChild(questionDiv);
+            });
+        }
+
+        // Handle answer selection
+        function selectAnswer(questionIndex, selectedAnswer, buttonElement) {
+            if (answeredQuestions.has(questionIndex)) return;
+
+            answeredQuestions.add(questionIndex);
+            const question = selectedQuestions[questionIndex];
+            const options = buttonElement.parentElement.querySelectorAll('.option');
+            const resultDiv = document.getElementById(`result-${questionIndex}`);
+
+            // Disable all options for this question
+            options.forEach(option => {
+                option.classList.add('disabled');
+                option.onclick = null;
+            });
+
+            // Show correct/incorrect styling
+            if (selectedAnswer === question.answer) {
+                buttonElement.classList.add('selected');
+                resultDiv.textContent = '✅ Correct!';
+                resultDiv.className = 'result correct';
+                score++;
+            } else {
+                buttonElement.classList.add('wrong');
+                resultDiv.textContent = `❌ Incorrect. Correct answer: ${question.answer}`;
+                resultDiv.className = 'result incorrect';
+                
+                // Highlight correct answer
+                options.forEach(option => {
+                    if (option.textContent.includes(question.answer)) {
+                        option.classList.add('selected');
+                    }
+                });
+            }
+
+            resultDiv.style.display = 'block';
+        }
+
+        // Calculate and display score
+        function calculateScore() {
+            const submitBtn = document.getElementById('submitBtn');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            
+            submitBtn.style.display = 'none';
+            
+            let message = '';
+            let emoji = '';
+            
+            if (score === 30) {
+                message = 'Perfect Score!';
+                emoji = '🏆';
+            } else if (score >= 25) {
+                message = 'Excellent!';
+                emoji = '🌟';
+            } else if (score >= 20) {
+                message = 'Good Job!';
+                emoji = '👏';
+            } else if (score >= 15) {
+                message = 'Well Done!';
+                emoji = '👍';
+            } else {
+                message = 'Keep Practicing!';
+                emoji = '📚';
+            }
+            
+            scoreDisplay.innerHTML = `
+                <div style="font-size: 1.5em; margin-bottom: 10px;">${emoji} ${message}</div>
+                <div style="font-size: 2.5em; font-weight: bold; color: #48bb78;">${score}/30</div>
+                <div class="score-text">Score: ${Math.round((score/30)*100)}%</div>
+                <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 30px; background: #667eea; color: white; border: none; border-radius: 25px; font-size: 1.1em; cursor: pointer;">Try Again</button>
+            `;
+            scoreDisplay.style.display = 'block';
+        }
+
+        // Initialize quiz on page load
+        window.onload = initializeQuiz;
+    </script>
+</body>
+</html>
