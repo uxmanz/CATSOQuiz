@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CATSO Maths Exam Quiz</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #5a67d8;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .question {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            color: #5a67d8;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .question-text {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .option {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #cbd5e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+        
+        .option:hover:not(.disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+        
+        .option.selected {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+        }
+        
+        .option.wrong {
+            background: #f56565;
+            color: white;
+            border-color: #f56565;
+        }
+        
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .result.correct {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .result.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        #submitBtn {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 40px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #submitBtn:hover {
+            background: #38a169;
+            transform: scale(1.05);
+        }
+        
+        #scoreDisplay {
+            text-align: center;
+            font-size: 2em;
+            color: #5a67d8;
+            margin-top: 30px;
+            padding: 20px;
+            background: #e6fffa;
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .score-text {
+            font-size: 0.6em;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 CATSO Maths Exam Quiz 3 Class 🎯</h1>
+        <div id="quizContainer"></div>
+        <button id="submitBtn" onclick="calculateScore()">Submit Quiz</button>
+        <div id="scoreDisplay"></div>
+    </div>
+
+    <script>
+        // All questions data
+      const allQuestions = [
+    { q: "Which number is an odd number?", options: ["14", "17", "20", "10"], answer: "17" },
+    { q: "Which number is an even number?", options: ["13", "19", "22", "27"], answer: "22" },
+    { q: "Which number is divisible by 5?", options: ["12", "23", "25", "37"], answer: "25" },
+    { q: "Which number is divisible by 2?", options: ["15", "21", "28", "33"], answer: "28" },
+    { q: "Which of these is a prime number?", options: ["9", "21", "13", "27"], answer: "13" },
+    { q: "Which of these is a multiple of 7?", options: ["15", "21", "25", "34"], answer: "21" },
+    { q: "Which number is a factor of 36?", options: ["7", "11", "12", "19"], answer: "12" },
+    { q: "Which of these is a 3-digit even number?", options: ["125", "317", "428", "539"], answer: "428" },
+    { q: "Which number is a multiple of 5?", options: ["18", "25", "32", "41"], answer: "25" },
+    { q: "Which number is a factor of 24?", options: ["5", "7", "8", "11"], answer: "8" },
+    { q: "Which number is a multiple of 4?", options: ["14", "18", "24", "27"], answer: "24" },
+    { q: "Which number is a factor of 30?", options: ["4", "6", "7", "11"], answer: "6" },
+    { q: "Which is the smallest prime number?", options: ["1", "2", "3", "5"], answer: "2" },
+    { q: "Which number is not a prime number?", options: ["5", "7", "11", "15"], answer: "15" },
+    { q: "Which number is divisible by 10?", options: ["25", "34", "40", "47"], answer: "40" },
+    { q: "Which number is divisible by 3?", options: ["14", "18", "25", "31"], answer: "18" },
+    { q: "Which number is a multiple of 6?", options: ["14", "18", "25", "31"], answer: "18" },
+    { q: "Which number is a factor of 48?", options: ["5", "7", "8", "11"], answer: "8" },
+    { q: "Which number is an odd number?", options: ["24", "36", "41", "50"], answer: "41" },
+    { q: "Which number is an even number?", options: ["31", "45", "52", "67"], answer: "52" },
+
+    { q: "Which shape has no sides and no corners?", options: ["Triangle", "Square", "Circle", "Rectangle"], answer: "Circle" },
+    { q: "Which solid shape has 6 faces?", options: ["Sphere", "Cube", "Cone", "Cylinder"], answer: "Cube" },
+    { q: "Which shape has 1 curved surface and 2 flat faces?", options: ["Cube", "Sphere", "Cylinder", "Pyramid"], answer: "Cylinder" },
+    { q: "Which shape has 3 sides?", options: ["Square", "Triangle", "Circle", "Rectangle"], answer: "Triangle" },
+    { q: "Which shape has 4 equal sides?", options: ["Triangle", "Square", "Circle", "Oval"], answer: "Square" },
+    { q: "Which shape has 4 sides but opposite sides are equal?", options: ["Rectangle", "Triangle", "Circle", "Pentagon"], answer: "Rectangle" },
+    { q: "Which shape has 5 sides?", options: ["Triangle", "Square", "Pentagon", "Hexagon"], answer: "Pentagon" },
+    { q: "Which shape has 6 sides?", options: ["Pentagon", "Hexagon", "Triangle", "Square"], answer: "Hexagon" },
+    { q: "Which solid shape is round like a ball?", options: ["Cube", "Cone", "Sphere", "Cylinder"], answer: "Sphere" },
+    { q: "Which solid shape has a circular base and a pointed top?", options: ["Cube", "Cone", "Sphere", "Cylinder"], answer: "Cone" },
+    { q: "Which solid shape looks like a can?", options: ["Sphere", "Cube", "Cylinder", "Cone"], answer: "Cylinder" },
+    { q: "Which shape has 4 corners?", options: ["Circle", "Triangle", "Square", "Oval"], answer: "Square" },
+    { q: "Which shape has 3 corners?", options: ["Triangle", "Circle", "Square", "Rectangle"], answer: "Triangle" },
+    { q: "Which solid shape has 8 corners?", options: ["Cube", "Sphere", "Cone", "Cylinder"], answer: "Cube" },
+    { q: "Which shape has 8 sides?", options: ["Hexagon", "Octagon", "Pentagon", "Triangle"], answer: "Octagon" },
+    { q: "Which shape has 7 sides?", options: ["Hexagon", "Heptagon", "Octagon", "Pentagon"], answer: "Heptagon" },
+    { q: "Which of these is a curved shape?", options: ["Square", "Triangle", "Circle", "Rectangle"], answer: "Circle" },
+    { q: "Which shape has four right angles?", options: ["Triangle", "Rectangle", "Circle", "Pentagon"], answer: "Rectangle" },
+    { q: "Which solid has one curved surface and one flat circular face?", options: ["Cone", "Cube", "Sphere", "Cylinder"], answer: "Cone" },
+    { q: "Which solid has only curved surface and no flat faces?", options: ["Cube", "Cone", "Sphere", "Cylinder"], answer: "Sphere" },
+
+    { q: "Which of these shows a straight angle?", options: ["60°", "90°", "180°", "45°"], answer: "180°" },
+    { q: "Which of these shows a right angle?", options: ["30°", "45°", "90°", "180°"], answer: "90°" },
+    { q: "Which of these shows an acute angle?", options: ["45°", "90°", "120°", "180°"], answer: "45°" },
+    { q: "Which of these shows an obtuse angle?", options: ["45°", "90°", "120°", "60°"], answer: "120°" },
+    { q: "How many degrees are in a right angle?", options: ["45°", "60°", "90°", "180°"], answer: "90°" },
+    { q: "How many degrees are in a straight angle?", options: ["90°", "120°", "180°", "360°"], answer: "180°" },
+    { q: "Which angle is smaller than 90°?", options: ["45°", "100°", "180°", "120°"], answer: "45°" },
+    { q: "Which angle is greater than 90° but less than 180°?", options: ["45°", "90°", "135°", "180°"], answer: "135°" },
+    { q: "How many right angles make a straight angle?", options: ["1", "2", "3", "4"], answer: "2" },
+    { q: "How many degrees are in a full turn?", options: ["90°", "180°", "270°", "360°"], answer: "360°" },
+
+    { q: "What is the place value of 9 in 392?", options: ["9", "90", "900", "92"], answer: "90" },
+    { q: "What is the place value of 7 in 784?", options: ["7", "70", "700", "78"], answer: "700" },
+    { q: "What is the place value of 4 in 784?", options: ["4", "40", "400", "84"], answer: "4" },
+    { q: "Which number is in the tens place in 784?", options: ["7", "8", "4", "78"], answer: "8" },
+    { q: "Which number is in the hundreds place in 563?", options: ["3", "6", "5", "56"], answer: "5" },
+    { q: "Which number is in the ones place in 927?", options: ["9", "2", "7", "27"], answer: "7" },
+    { q: "What is the place value of 5 in 452?", options: ["5", "50", "500", "52"], answer: "50" },
+    { q: "What is the place value of 3 in 631?", options: ["3", "30", "300", "31"], answer: "30" },
+    { q: "What is the place value of 8 in 812?", options: ["8", "80", "800", "812"], answer: "800" },
+    { q: "What is the place value of 6 in 465?", options: ["6", "60", "600", "65"], answer: "60" },
+
+    { q: "Which number is written in words as 'four hundred sixty'?", options: ["4600", "460", "406", "640"], answer: "460" },
+    { q: "Which number is written in words as 'three hundred twenty-five'?", options: ["352", "325", "235", "305"], answer: "325" },
+    { q: "Which number is written in words as 'five hundred twelve'?", options: ["521", "512", "502", "152"], answer: "512" },
+    { q: "Which number is written in words as 'seven hundred forty'?", options: ["704", "740", "470", "407"], answer: "740" },
+    { q: "Which number is written in words as 'eight hundred six'?", options: ["860", "806", "608", "680"], answer: "806" },
+    { q: "Which number is written in words as 'two hundred ninety-one'?", options: ["219", "291", "921", "201"], answer: "291" },
+    { q: "Which number is written in words as 'six hundred fifty-three'?", options: ["635", "653", "563", "603"], answer: "653" },
+    { q: "Which number is written in words as 'nine hundred eighteen'?", options: ["981", "918", "819", "908"], answer: "918" },
+    { q: "Which number is written in words as 'four hundred two'?", options: ["420", "402", "240", "204"], answer: "402" },
+    { q: "Which number is written in words as 'one hundred seventy-five'?", options: ["157", "175", "715", "105"], answer: "175" },
+
+    { q: "The Roman numeral X stands for:", options: ["5", "20", "10", "15"], answer: "10" },
+    { q: "The Roman numeral L stands for:", options: ["10", "100", "50", "25"], answer: "50" },
+    { q: "The Roman numeral V stands for:", options: ["5", "10", "50", "15"], answer: "5" },
+    { q: "The Roman numeral I stands for:", options: ["1", "5", "10", "100"], answer: "1" },
+    { q: "The Roman numeral C stands for:", options: ["10", "50", "100", "500"], answer: "100" },
+    { q: "Which Roman numeral represents 10?", options: ["V", "X", "L", "C"], answer: "X" },
+    { q: "Which Roman numeral represents 50?", options: ["X", "V", "L", "C"], answer: "L" },
+    { q: "Which Roman numeral represents 5?", options: ["I", "V", "X", "L"], answer: "V" },
+    { q: "Which Roman numeral represents 100?", options: ["C", "L", "X", "V"], answer: "C" },
+    { q: "Which Roman numeral represents 1?", options: ["I", "V", "X", "C"], answer: "I" },
+
+    { q: "Which unit is used to measure length?", options: ["Kilogram", "Litre", "Metre", "Gram"], answer: "Metre" },
+    { q: "Which unit is used to measure weight?", options: ["Metre", "Kilogram", "Litre", "Centimetre"], answer: "Kilogram" },
+    { q: "Which unit is used to measure liquid?", options: ["Gram", "Kilogram", "Litre", "Metre"], answer: "Litre" },
+    { q: "Which unit is best for measuring the length of a pencil?", options: ["Kilogram", "Centimetre", "Litre", "Kilometre"], answer: "Centimetre" },
+    { q: "Which unit is best for measuring the distance between two cities?", options: ["Centimetre", "Metre", "Kilometre", "Gram"], answer: "Kilometre" },
+    { q: "Which unit is best for measuring the weight of a bag of rice?", options: ["Litre", "Kilogram", "Metre", "Centimetre"], answer: "Kilogram" },
+    { q: "Which unit is best for measuring the amount of water in a bottle?", options: ["Litre", "Kilogram", "Metre", "Gram"], answer: "Litre" },
+    { q: "Which unit is used to measure small lengths?", options: ["Centimetre", "Kilogram", "Litre", "Kilometre"], answer: "Centimetre" },
+    { q: "Which unit is used to measure the weight of a small object?", options: ["Gram", "Litre", "Metre", "Kilometre"], answer: "Gram" },
+    { q: "Which unit is used to measure a long distance?", options: ["Gram", "Centimetre", "Kilometre", "Litre"], answer: "Kilometre" },
+
+    { q: "Which clock time shows a quarter past 3?", options: ["3:05", "3:15", "3:45", "3:30"], answer: "3:15" },
+    { q: "Which clock time shows half past 6?", options: ["6:15", "6:45", "6:30", "7:30"], answer: "6:30" },
+    { q: "Which clock time shows a quarter to 5?", options: ["4:15", "4:30", "4:45", "5:15"], answer: "4:45" },
+    { q: "Which clock time shows 10 minutes past 2?", options: ["2:05", "2:10", "2:15", "1:50"], answer: "2:10" },
+    { q: "Which clock time shows 20 minutes past 7?", options: ["7:10", "7:15", "7:20", "7:40"], answer: "7:20" },
+    { q: "Which clock time shows 30 minutes past 9?", options: ["9:15", "9:30", "9:45", "10:30"], answer: "9:30" },
+    { q: "Which clock time shows a quarter past 8?", options: ["8:05", "8:15", "8:30", "8:45"], answer: "8:15" },
+    { q: "Which clock time shows a quarter to 12?", options: ["11:15", "11:30", "11:45", "12:15"], answer: "11:45" },
+    { q: "Which clock time shows 5 minutes past 4?", options: ["4:05", "4:15", "3:55", "4:50"], answer: "4:05" },
+    { q: "Which clock time shows 10 minutes to 6?", options: ["5:10", "5:30", "5:50", "6:10"], answer: "5:50" },
+
+    { q: "How many days are there in a week?", options: ["5", "6", "7", "8"], answer: "7" },
+    { q: "How many months are there in a year?", options: ["10", "11", "12", "13"], answer: "12" },
+    { q: "How many days are there in a weekend?", options: ["1", "2", "3", "4"], answer: "2" },
+    { q: "How many hours are there in one day?", options: ["12", "20", "24", "30"], answer: "24" },
+    { q: "How many minutes are there in one hour?", options: ["30", "45", "60", "100"], answer: "60" },
+    { q: "How many seconds are there in one minute?", options: ["30", "45", "60", "100"], answer: "60" },
+    { q: "Which month comes after March?", options: ["February", "April", "May", "June"], answer: "April" },
+    { q: "Which month comes before December?", options: ["October", "November", "January", "September"], answer: "November" },
+    { q: "Which day comes after Monday?", options: ["Sunday", "Tuesday", "Wednesday", "Friday"], answer: "Tuesday" },
+    { q: "Which day comes before Friday?", options: ["Monday", "Wednesday", "Thursday", "Saturday"], answer: "Thursday" },
+
+    { q: "What is 5 + 3?", options: ["6", "7", "8", "9"], answer: "8" },
+    { q: "What is 7 + 4?", options: ["10", "11", "12", "13"], answer: "11" },
+    { q: "What is 9 + 6?", options: ["13", "14", "15", "16"], answer: "15" },
+    { q: "What is 12 + 5?", options: ["15", "16", "17", "18"], answer: "17" },
+    { q: "What is 20 + 7?", options: ["25", "26", "27", "28"], answer: "27" },
+    { q: "What is 14 + 8?", options: ["20", "21", "22", "23"], answer: "22" },
+    { q: "What is 25 + 6?", options: ["29", "30", "31", "32"], answer: "31" },
+    { q: "What is 32 + 9?", options: ["39", "40", "41", "42"], answer: "41" },
+    { q: "What is 45 + 5?", options: ["40", "45", "50", "55"], answer: "50" },
+    { q: "What is 16 + 13?", options: ["27", "28", "29", "30"], answer: "29" },
+
+    { q: "What is 9 - 4?", options: ["3", "4", "5", "6"], answer: "5" },
+    { q: "What is 15 - 7?", options: ["6", "7", "8", "9"], answer: "8" },
+    { q: "What is 20 - 9?", options: ["9", "10", "11", "12"], answer: "11" },
+    { q: "What is 25 - 8?", options: ["15", "16", "17", "18"], answer: "17" },
+    { q: "What is 30 - 12?", options: ["16", "17", "18", "19"], answer: "18" },
+    { q: "What is 40 - 15?", options: ["20", "25", "30", "35"], answer: "25" },
+    { q: "What is 50 - 23?", options: ["25", "26", "27", "28"], answer: "27" },
+    { q: "What is 36 - 14?", options: ["20", "21", "22", "23"], answer: "22" },
+    { q: "What is 42 - 18?", options: ["22", "23", "24", "25"], answer: "24" },
+    { q: "What is 60 - 25?", options: ["30", "35", "40", "45"], answer: "35" },
+
+    { q: "What is 2 × 3?", options: ["4", "5", "6", "7"], answer: "6" },
+    { q: "What is 4 × 5?", options: ["15", "20", "25", "30"], answer: "20" },
+    { q: "What is 6 × 3?", options: ["15", "18", "21", "24"], answer: "18" },
+    { q: "What is 7 × 4?", options: ["21", "24", "28", "32"], answer: "28" },
+    { q: "What is 8 × 5?", options: ["30", "35", "40", "45"], answer: "40" },
+    { q: "What is 9 × 3?", options: ["18", "21", "27", "30"], answer: "27" },
+    { q: "What is 6 × 7?", options: ["36", "40", "42", "48"], answer: "42" },
+    { q: "What is 8 × 6?", options: ["42", "48", "54", "56"], answer: "48" },
+    { q: "What is 9 × 5?", options: ["35", "40", "45", "50"], answer: "45" },
+    { q: "What is 7 × 8?", options: ["48", "54", "56", "64"], answer: "56" },
+
+    { q: "What is 10 ÷ 2?", options: ["3", "4", "5", "6"], answer: "5" },
+    { q: "What is 12 ÷ 3?", options: ["2", "3", "4", "5"], answer: "4" },
+    { q: "What is 20 ÷ 4?", options: ["4", "5", "6", "7"], answer: "5" },
+    { q: "What is 30 ÷ 5?", options: ["5", "6", "7", "8"], answer: "6" },
+    { q: "What is 24 ÷ 6?", options: ["3", "4", "5", "6"], answer: "4" },
+    { q: "What is 36 ÷ 6?", options: ["4", "5", "6", "7"], answer: "6" },
+    { q: "What is 42 ÷ 7?", options: ["5", "6", "7", "8"], answer: "6" },
+    { q: "What is 48 ÷ 8?", options: ["5", "6", "7", "8"], answer: "6" },
+    { q: "What is 45 ÷ 5?", options: ["7", "8", "9", "10"], answer: "9" },
+    { q: "What is 56 ÷ 7?", options: ["6", "7", "8", "9"], answer: "8" },
+
+    { q: "Which number is greater?", options: ["25", "18", "12", "20"], answer: "25" },
+    { q: "Which number is smaller?", options: ["45", "32", "51", "67"], answer: "32" },
+    { q: "Which is the greatest number?", options: ["78", "87", "68", "76"], answer: "87" },
+    { q: "Which is the smallest number?", options: ["34", "43", "24", "42"], answer: "24" },
+    { q: "Which number comes immediately after 49?", options: ["48", "50", "51", "59"], answer: "50" },
+    { q: "Which number comes immediately before 70?", options: ["68", "69", "71", "72"], answer: "69" },
+    { q: "Which number comes between 34 and 36?", options: ["33", "35", "37", "38"], answer: "35" },
+    { q: "Which number is closest to 50?", options: ["42", "48", "61", "70"], answer: "48" },
+    { q: "Which number is greater than 60?", options: ["45", "52", "59", "64"], answer: "64" },
+    { q: "Which number is less than 40?", options: ["42", "45", "38", "50"], answer: "38" },
+
+    { q: "If you have 5 apples and get 3 more, how many apples do you have?", options: ["7", "8", "9", "10"], answer: "8" },
+    { q: "Ali has 10 pencils and gives away 4. How many pencils are left?", options: ["5", "6", "7", "8"], answer: "6" },
+    { q: "There are 6 birds on a tree. 4 more arrive. How many birds are there?", options: ["8", "9", "10", "11"], answer: "10" },
+    { q: "Sara has 15 candies and eats 5. How many candies remain?", options: ["8", "9", "10", "11"], answer: "10" },
+    { q: "There are 4 boxes with 3 toys in each. How many toys are there?", options: ["7", "10", "12", "14"], answer: "12" },
+    { q: "There are 20 balloons. 7 burst. How many balloons are left?", options: ["11", "12", "13", "14"], answer: "13" },
+    { q: "A farmer has 5 baskets with 4 apples each. How many apples are there?", options: ["15", "20", "25", "30"], answer: "20" },
+    { q: "There are 18 books shared equally among 3 children. How many books does each child get?", options: ["5", "6", "7", "8"], answer: "6" },
+    { q: "A shop has 25 pencils and sells 10. How many pencils are left?", options: ["10", "15", "20", "25"], answer: "15" },
+    { q: "There are 7 bags with 2 oranges in each bag. How many oranges are there?", options: ["12", "14", "16", "18"], answer: "14" },
+
+    { q: "Which number has 3 hundreds, 4 tens, and 2 ones?", options: ["324", "342", "432", "234"], answer: "342" },
+    { q: "Which number has 5 hundreds, 2 tens, and 6 ones?", options: ["526", "562", "256", "625"], answer: "526" },
+    { q: "Which number has 7 hundreds, 0 tens, and 4 ones?", options: ["704", "740", "407", "470"], answer: "704" },
+    { q: "What is 400 + 30 + 5?", options: ["435", "453", "405", "430"], answer: "435" },
+    { q: "What is 600 + 20 + 8?", options: ["628", "682", "608", "620"], answer: "628" },
+    { q: "What is 500 + 70 + 3?", options: ["537", "573", "753", "503"], answer: "573" },
+    { q: "What is 800 + 6?", options: ["806", "860", "608", "800"], answer: "806" },
+    { q: "What is 900 + 40?", options: ["904", "940", "490", "900"], answer: "940" },
+    { q: "What is 300 + 25?", options: ["305", "325", "350", "523"], answer: "325" },
+    { q: "What is 700 + 18?", options: ["708", "718", "780", "701"], answer: "718" },
+
+    { q: "Which number is nearest to 100?", options: ["75", "89", "120", "150"], answer: "89" },
+    { q: "Which number is nearest to 500?", options: ["450", "490", "550", "600"], answer: "490" },
+    { q: "What is 10 more than 25?", options: ["30", "35", "40", "45"], answer: "35" },
+    { q: "What is 10 less than 60?", options: ["40", "45", "50", "55"], answer: "50" },
+    { q: "What is 100 more than 250?", options: ["300", "350", "450", "150"], answer: "350" },
+    { q: "What is 100 less than 700?", options: ["500", "600", "650", "800"], answer: "600" },
+    { q: "What is 5 more than 45?", options: ["40", "48", "50", "55"], answer: "50" },
+    { q: "What is 5 less than 30?", options: ["20", "25", "26", "35"], answer: "25" },
+    { q: "What is 20 more than 70?", options: ["80", "90", "100", "110"], answer: "90" },
+    { q: "What is 20 less than 90?", options: ["60", "70", "80", "100"], answer: "70" }
+];
+
+        let selectedQuestions = [];
+        let answeredQuestions = new Set();
+        let score = 0;
+
+        // Shuffle array and get 30 random questions
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled.slice(0, 30);
+        }
+
+        // Initialize quiz
+        function initializeQuiz() {
+            selectedQuestions = shuffleArray(allQuestions);
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+
+            selectedQuestions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.id = `question-${index}`;
+
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.textContent = `Question ${index + 1}`;
+
+                const questionText = document.createElement('div');
+                questionText.className = 'question-text';
+                questionText.textContent = question.q;
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+
+                question.options.forEach((option, optionIndex) => {
+                    const optionBtn = document.createElement('button');
+                    optionBtn.className = 'option';
+                    optionBtn.textContent = `${String.fromCharCode(65 + optionIndex)}) ${option}`;
+                    optionBtn.onclick = () => selectAnswer(index, option, optionBtn);
+                    optionsDiv.appendChild(optionBtn);
+                });
+
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result';
+                resultDiv.id = `result-${index}`;
+                resultDiv.style.display = 'none';
+
+                questionDiv.appendChild(questionNumber);
+                questionDiv.appendChild(questionText);
+                questionDiv.appendChild(optionsDiv);
+                questionDiv.appendChild(resultDiv);
+                container.appendChild(questionDiv);
+            });
+        }
+
+        // Handle answer selection
+        function selectAnswer(questionIndex, selectedAnswer, buttonElement) {
+            if (answeredQuestions.has(questionIndex)) return;
+
+            answeredQuestions.add(questionIndex);
+            const question = selectedQuestions[questionIndex];
+            const options = buttonElement.parentElement.querySelectorAll('.option');
+            const resultDiv = document.getElementById(`result-${questionIndex}`);
+
+            // Disable all options for this question
+            options.forEach(option => {
+                option.classList.add('disabled');
+                option.onclick = null;
+            });
+
+            // Show correct/incorrect styling
+            if (selectedAnswer === question.answer) {
+                buttonElement.classList.add('selected');
+                resultDiv.textContent = '✅ Correct!';
+                resultDiv.className = 'result correct';
+                score++;
+            } else {
+                buttonElement.classList.add('wrong');
+                resultDiv.textContent = `❌ Incorrect. Correct answer: ${question.answer}`;
+                resultDiv.className = 'result incorrect';
+                
+                // Highlight correct answer
+                options.forEach(option => {
+                    if (option.textContent.includes(question.answer)) {
+                        option.classList.add('selected');
+                    }
+                });
+            }
+
+            resultDiv.style.display = 'block';
+        }
+
+        // Calculate and display score
+        function calculateScore() {
+            const submitBtn = document.getElementById('submitBtn');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            
+            submitBtn.style.display = 'none';
+            
+            let message = '';
+            let emoji = '';
+            
+            if (score === 30) {
+                message = 'Perfect Score!';
+                emoji = '🏆';
+            } else if (score >= 25) {
+                message = 'Excellent!';
+                emoji = '🌟';
+            } else if (score >= 20) {
+                message = 'Good Job!';
+                emoji = '👏';
+            } else if (score >= 15) {
+                message = 'Well Done!';
+                emoji = '👍';
+            } else {
+                message = 'Keep Practicing!';
+                emoji = '📚';
+            }
+            
+            scoreDisplay.innerHTML = `
+                <div style="font-size: 1.5em; margin-bottom: 10px;">${emoji} ${message}</div>
+                <div style="font-size: 2.5em; font-weight: bold; color: #48bb78;">${score}/30</div>
+                <div class="score-text">Score: ${Math.round((score/30)*100)}%</div>
+                <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 30px; background: #667eea; color: white; border: none; border-radius: 25px; font-size: 1.1em; cursor: pointer;">Try Again</button>
+            `;
+            scoreDisplay.style.display = 'block';
+        }
+
+        // Initialize quiz on page load
+        window.onload = initializeQuiz;
+    </script>
+</body>
+</html>
