@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CATSO 3 and4 Grade Maths Exam Quiz</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #5a67d8;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .question {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            color: #5a67d8;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .question-text {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .option {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #cbd5e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+        
+        .option:hover:not(.disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+        
+        .option.selected {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+        }
+        
+        .option.wrong {
+            background: #f56565;
+            color: white;
+            border-color: #f56565;
+        }
+        
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .result.correct {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .result.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        #submitBtn {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 40px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #submitBtn:hover {
+            background: #38a169;
+            transform: scale(1.05);
+        }
+        
+        #scoreDisplay {
+            text-align: center;
+            font-size: 2em;
+            color: #5a67d8;
+            margin-top: 30px;
+            padding: 20px;
+            background: #e6fffa;
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .score-text {
+            font-size: 0.6em;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 CATSO 3 and 4 Grade Maths Quiz 🎯</h1>
+        <div id="quizContainer"></div>
+        <button id="submitBtn" onclick="calculateScore()">Submit Quiz</button>
+        <div id="scoreDisplay"></div>
+    </div>
+
+    <script>
+   // All questions data
+const allQuestions = [
+  // Questions 1-15: Place Value and Number Systems
+  { q: "In the Pakistani place value system, one hundred thousand is equal to:", options: ["1 Lakh", "10 Lakh", "1 Crore", "10 thousand"], answer: "1 Lakh" },
+  { q: "In the International place value system, the place immediately to the left of ten thousand is:", options: ["Millions", "Hundred thousand", "Ten million", "Lakhs"], answer: "Hundred thousand" },
+  { q: "How many total digits are in the number one million?", options: ["5 digits", "6 digits", "7 digits", "8 digits"], answer: "7 digits" },
+  { q: "In Roman numerals, which letter represents the number 10?", options: ["V", "X", "L", "C"], answer: "X" },
+  { q: "In Roman numerals, which letter represents the number 5?", options: ["V", "I", "X", "D"], answer: "V" },
+  { q: "When writing Roman numerals, how many times at most can the symbol 'X' be repeated consecutively?", options: ["2 times", "3 times", "4 times", "5 times"], answer: "3 times" },
+  { q: "In Roman numerals, placing symbol 'I' to the left of 'V' (IV) indicates:", options: ["Addition of 1 to 5", "Subtraction of 1 from 5", "Multiplication of 1 and 5", "Division of 5 by 1"], answer: "Subtraction of 1 from 5" },
+  { q: "A whole number greater than 1 that has only two distinct factors (1 and itself) is called a:", options: ["Composite number", "Prime number", "Even number", "Square number"], answer: "Prime number" },
+  { q: "A whole number having more than two factors is known as a:", options: ["Composite number", "Prime number", "Odd number", "Ordinal number"], answer: "Composite number" },
+  { q: "Which whole number is classified as neither prime nor composite?", options: ["9", "1", "2", "3"], answer: "1" },
+  { q: "What is the only even prime number in mathematics?", options: ["0", "2", "4", "6"], answer: "2" },
+  { q: "What is the smallest odd prime number?", options: ["1", "3", "5", "7"], answer: "3" },
+  { q: "What is the smallest composite number?", options: ["1", "2", "4", "6"], answer: "4" },
+  { q: "A whole number that divides another number completely without leaving a remainder is called a:", options: ["Factor", "Multiple", "Quotient", "Remainder"], answer: "Factor" },
+  { q: "Numbers obtained by multiplying a given whole number by counting numbers (1, 2, 3...) are its:", options: ["Factors", "Multiples", "Divisors", "Fractions"], answer: "Multiples" },
+
+  // Questions 16-31: Factors, Multiples and Rounding
+  { q: "Every non-zero whole number is always a factor of:", options: ["Only zero", "Only one", "Itself", "All odd numbers"], answer: "Itself" },
+  { q: "Which number is a common factor of every whole number?", options: ["0", "1", "2", "10"], answer: "1" },
+  { q: "What is the smallest multiple of any non-zero whole number?", options: ["0", "1", "The number itself", "2"], answer: "0" },
+  { q: "How many total multiples does any non-zero whole number have?", options: ["Exactly 10", "Exactly 100", "Finite", "Infinite"], answer: "Infinite" },
+  { q: "According to divisibility rules, a number is divisible by 2 if its ones digit is:", options: ["An even digit (0, 2, 4, 6, 8)", "An odd digit (1, 3, 5, 7, 9)", "Only 0", "Only 5"], answer: "An even digit (0, 2, 4, 6, 8)" },
+  { q: "A whole number is completely divisible by 5 if its ones digit is:", options: ["0 or 2", "0 or 5", "1 or 5", "5 or 9"], answer: "0 or 5" },
+  { q: "A whole number is divisible by 10 only when its units place ends in:", options: ["0", "5", "1", "Any even number"], answer: "0" },
+  { q: "A number is divisible by 3 if:", options: ["Its last digit is 3", "The sum of its digits is divisible by 3", "Its last digit is odd", "It ends in 0 or 3"], answer: "The sum of its digits is divisible by 3" },
+  { q: "What does the mathematical acronym HCF represent?", options: ["Highest Common Factor", "Heavy Common Fraction", "Highest Common Fraction", "Half Common Factor"], answer: "Highest Common Factor" },
+  { q: "What does the mathematical acronym LCM represent?", options: ["Largest Common Multiple", "Least Common Multiple", "Lowest Common Fraction", "Less Common Multiple"], answer: "Least Common Multiple" },
+  { q: "The greatest number that exactly divides two or more given numbers without remainder is their:", options: ["LCM", "HCF", "Prime factor", "Multiple"], answer: "HCF" },
+  { q: "The smallest non-zero common multiple of two or more given numbers is their:", options: ["LCM", "HCF", "Product", "Divisor"], answer: "LCM" },
+  { q: "When rounding a number to the nearest 10, which place value digit is observed?", options: ["Ones digit", "Tens digit", "Hundreds digit", "Thousands digit"], answer: "Ones digit" },
+  { q: "When rounding off to the nearest 100, if the tens digit is 5 or greater, the hundreds digit:", options: ["Decreases by 1", "Remains unchanged", "Increases by 1", "Becomes zero"], answer: "Increases by 1" },
+  { q: "When rounding off to the nearest 1000, if the hundreds digit is less than 5, the thousands digit:", options: ["Increases by 1", "Remains unchanged", "Decreases by 1", "Doubles"], answer: "Remains unchanged" },
+  { q: "The individual numbers combined together in an addition problem are called:", options: ["Addends", "Sums", "Factors", "Divisors"], answer: "Addends" },
+
+  // Questions 32-49: Basic Arithmetic Operations
+  { q: "Which number serves as the additive identity element for all numbers?", options: ["0", "1", "10", "-1"], answer: "0" },
+  { q: "In a subtraction problem, the number from which another quantity is subtracted is called the:", options: ["Minuend", "Subtrahend", "Difference", "Quotient"], answer: "Minuend" },
+  { q: "In a subtraction problem, the number that is taken away is called the:", options: ["Minuend", "Subtrahend", "Remainder", "Multiplier"], answer: "Subtrahend" },
+  { q: "Subtraction is mathematically the inverse (opposite) operation of:", options: ["Addition", "Multiplication", "Division", "Rounding"], answer: "Addition" },
+  { q: "Does the commutative property apply to the subtraction of whole numbers?", options: ["Always", "Never", "Only for even numbers", "Only for single-digit numbers"], answer: "Never" },
+  { q: "In multiplication, the number that is being multiplied is termed the:", options: ["Multiplicand", "Multiplier", "Product", "Quotient"], answer: "Multiplicand" },
+  { q: "In multiplication, the number by which another number is multiplied is termed the:", options: ["Multiplicand", "Multiplier", "Dividend", "Factorial"], answer: "Multiplier" },
+  { q: "Which number serves as the multiplicative identity element?", options: ["0", "1", "2", "10"], answer: "1" },
+  { q: "In division, the total number being split into equal groups is called the:", options: ["Dividend", "Divisor", "Quotient", "Remainder"], answer: "Dividend" },
+  { q: "In division, the number that indicates how many equal groups are being made is the:", options: ["Dividend", "Divisor", "Product", "Minuend"], answer: "Divisor" },
+  { q: "The main whole-number result obtained from dividing two numbers is called the:", options: ["Quotient", "Remainder", "Difference", "Addend"], answer: "Quotient" },
+  { q: "The leftover amount that cannot be divided into another whole equal group is the:", options: ["Divisor", "Quotient", "Remainder", "Multiplier"], answer: "Remainder" },
+  { q: "In any correct mathematical division, the remainder must always be:", options: ["Greater than the divisor", "Equal to the divisor", "Less than the divisor", "Greater than the dividend"], answer: "Less than the divisor" },
+  { q: "Dividing any whole number by zero (0) results in an answer that is:", options: ["Zero", "One", "The number itself", "Not defined"], answer: "Not defined" },
+  { q: "When zero is divided by any non-zero whole number, the resulting quotient is:", options: ["Zero", "One", "The number itself", "Not defined"], answer: "Zero" },
+  { q: "When any non-zero number is divided by itself, the quotient is always:", options: ["Zero", "One", "The number itself", "Double the number"], answer: "One" },
+  { q: "When any whole number is divided by 1, the resulting quotient equals:", options: ["1", "0", "The number itself", "Not defined"], answer: "The number itself" },
+  { q: "Division is mathematically the inverse (opposite) operation of:", options: ["Addition", "Subtraction", "Multiplication", "Estimation"], answer: "Multiplication" },
+
+  // Questions 50-65: Multiplication, Fractions and Decimals
+  { q: "Multiplying a whole number by 10 shifts all its existing digits one place to the:", options: ["Left", "Right", "Bottom", "Decimal position"], answer: "Left" },
+  { q: "The process of finding an approximate value close to an exact answer without calculating fully is:", options: ["Factoring", "Estimation", "Simplification", "Division"], answer: "Estimation" },
+  { q: "In a fraction, the numeral written above the fraction bar is called the:", options: ["Numerator", "Denominator", "Quotient", "Divisor"], answer: "Numerator" },
+  { q: "In a fraction, the numeral written below the fraction bar is called the:", options: ["Numerator", "Denominator", "Remainder", "Factor"], answer: "Denominator" },
+  { q: "A fraction whose numerator is strictly less than its denominator is called a:", options: ["Proper fraction", "Improper fraction", "Mixed fraction", "Complex fraction"], answer: "Proper fraction" },
+  { q: "A fraction whose numerator is greater than or equal to its denominator is called a/an:", options: ["Proper fraction", "Improper fraction", "Unit fraction", "Decimal fraction"], answer: "Improper fraction" },
+  { q: "A numerical quantity consisting of a whole number combined with a proper fraction is a:", options: ["Simple fraction", "Mixed fraction", "Decimal fraction", "Unit fraction"], answer: "Mixed fraction" },
+  { q: "Any fraction that has 1 as its numerator is defined as a:", options: ["Unit fraction", "Like fraction", "Unlike fraction", "Whole fraction"], answer: "Unit fraction" },
+  { q: "Two or more fractions that share identical denominators are called:", options: ["Like fractions", "Unlike fractions", "Proper fractions", "Unit fractions"], answer: "Like fractions" },
+  { q: "Two or more fractions that have differing denominators are called:", options: ["Like fractions", "Unlike fractions", "Equivalent fractions", "Equal fractions"], answer: "Unlike fractions" },
+  { q: "Fractions that have different numerators and denominators but equal numerical value are:", options: ["Unlike fractions", "Equivalent fractions", "Unit fractions", "Mixed fractions"], answer: "Equivalent fractions" },
+  { q: "A fraction is in its simplest form (lowest terms) when the HCF of its numerator and denominator is:", options: ["1", "0", "2", "10"], answer: "1" },
+  { q: "The dot placed between the whole-number portion and fractional portion of a decimal is the:", options: ["Colon", "Comma", "Decimal point", "Dash"], answer: "Decimal point" },
+  { q: "In a decimal number, the place value of the first digit immediately to the right of the decimal point is:", options: ["Tenths", "Hundredths", "Thousandths", "Tens"], answer: "Tenths" },
+  { q: "In a decimal number, the place value of the second digit to the right of the decimal point is:", options: ["Tenths", "Hundredths", "Hundreds", "Ones"], answer: "Hundredths" },
+  { q: "Fractions having denominators of 10, 100, or 1000 can be expressed directly as:", options: ["Decimal numbers", "Prime numbers", "Roman numerals", "Whole numbers"], answer: "Decimal numbers" },
+
+  // Questions 66-81: Measurement, Time and Calendar
+  { q: "Which standard metric unit is best suited to measure long distances between two cities?", options: ["Millimeter", "Centimeter", "Meter", "Kilometer (km)"], answer: "Kilometer (km)" },
+  { q: "Which standard metric unit is best suited to measure the thickness of a coin?", options: ["Millimeter (mm)", "Meter (m)", "Kilometer (km)", "Liter (l)"], answer: "Millimeter (mm)" },
+  { q: "How many millimeters make up 1 centimeter?", options: ["10 mm", "100 mm", "1000 mm", "5 mm"], answer: "10 mm" },
+  { q: "How many meters make up 1 kilometer?", options: ["10 m", "100 m", "1000 m", "10,000 m"], answer: "1000 m" },
+  { q: "What standard metric unit is used to measure very light items like a dose of medicine?", options: ["Milligram (mg)", "Kilogram (kg)", "Kilometer (km)", "Milliliter (ml)"], answer: "Milligram (mg)" },
+  { q: "How many milligrams are equal to 1 standard gram?", options: ["10 mg", "100 mg", "1000 mg", "500 mg"], answer: "1000 mg" },
+  { q: "To convert a measurement from a larger metric unit to a smaller metric unit, one must:", options: ["Multiply", "Divide", "Subtract", "Add"], answer: "Multiply" },
+  { q: "To convert a measurement from a smaller metric unit to a larger metric unit, one must:", options: ["Multiply", "Divide", "Add", "Round"], answer: "Divide" },
+  { q: "The total distance around the closed outer boundary of a 2D shape is its:", options: ["Perimeter", "Area", "Volume", "Capacity"], answer: "Perimeter" },
+  { q: "The amount of flat surface enclosed inside the boundary of a closed 2D shape is its:", options: ["Perimeter", "Area", "Length", "Circumference"], answer: "Area" },
+  { q: "Area of a flat surface is always expressed using:", options: ["Linear units (cm, m)", "Square units (sq cm, sq m)", "Cubic units", "Units of capacity"], answer: "Square units (sq cm, sq m)" },
+  { q: "In a 12-hour clock system, the abbreviation 'a.m.' stands for:", options: ["Ante Meridiem (before midday)", "After Midday", "All Morning", "At Midnight"], answer: "Ante Meridiem (before midday)" },
+  { q: "In a 12-hour clock system, the abbreviation 'p.m.' stands for:", options: ["Past Morning", "Post Meridiem (after midday)", "Pre Midday", "Prime Morning"], answer: "Post Meridiem (after midday)" },
+  { q: "In a 24-hour clock system, the time of midnight is written as:", options: ["00:00", "12:00", "24:60", "01:00"], answer: "00:00" },
+  { q: "How many days are in a standard common calendar year?", options: ["364 days", "365 days", "366 days", "360 days"], answer: "365 days" },
+  { q: "How many total days are in a leap year?", options: ["365 days", "366 days", "364 days", "367 days"], answer: "366 days" },
+
+  // Questions 97-120: Word Problems
+  { q: "Zainab bought a tray of 60 eggs. On the way home, 12 eggs broke. How many unbroken eggs remain?", options: ["42 eggs", "48 eggs", "52 eggs", "72 eggs"], answer: "48 eggs" },
+  { q: "Hamza gives a Rs. 100 note to a shopkeeper to buy a toy that costs Rs. 65. How much change will Hamza get back?", options: ["Rs. 25", "Rs. 35", "Rs. 45", "Rs. 165"], answer: "Rs. 35" },
+  { q: "A fruit seller has 56 apples and places 7 apples into each bag. How many bags does he need?", options: ["6 bags", "7 bags", "8 bags", "49 bags"], answer: "8 bags" },
+  { q: "A bus has 42 passengers. At the first stop, 15 passengers get off. How many passengers remain on the bus?", options: ["23 passengers", "27 passengers", "33 passengers", "57 passengers"], answer: "27 passengers" },
+  { q: "Fatima has 85 beads. She uses 29 beads to make a bracelet. How many beads are left with Fatima?", options: ["54 beads", "56 beads", "66 beads", "114 beads"], answer: "56 beads" },
+  { q: "Aroosh bought 4 boxes of colored pencils. Each box has 12 pencils. How many pencils does Aroosh have altogether?", options: ["16 pencils", "36 pencils", "48 pencils", "52 pencils"], answer: "48 pencils" },
+  { q: "A crate contains 90 mangoes. If 18 mangoes are rotten, how many fresh mangoes are in the crate?", options: ["62 mangoes", "72 mangoes", "78 mangoes", "108 mangoes"], answer: "72 mangoes" },
+  { q: "A teacher distributes 72 notebooks equally among 8 students. How many notebooks does each student receive?", options: ["7 notebooks", "8 notebooks", "9 notebooks", "12 notebooks"], answer: "9 notebooks" },
+  { q: "Ayesha had Rs. 500. She spent Rs. 275 on a school bag. How many rupees are left with her?", options: ["Rs. 215", "Rs. 225", "Rs. 235", "Rs. 325"], answer: "Rs. 225" },
+  { q: "There are 45 students in Class 4-A and 38 students in Class 4-B. How many students are there in both classes combined?", options: ["73 students", "81 students", "83 students", "93 students"], answer: "83 students" },
+  { q: "Hassan reads 15 pages of a storybook every day. How many pages will he read in 5 days?", options: ["20 pages", "60 pages", "70 pages", "75 pages"], answer: "75 pages" },
+  { q: "A poultry farmer gathered 120 eggs in the morning and sold 45 eggs in the afternoon. How many eggs are remaining?", options: ["65 eggs", "75 eggs", "85 eggs", "165 eggs"], answer: "75 eggs" },
+  { q: "Tariq has Rs. 150. His father gives him Rs. 250 as Eidi. How many rupees does Tariq have in total?", options: ["Rs. 300", "Rs. 350", "Rs. 400", "Rs. 450"], answer: "Rs. 400" },
+  { q: "A rope is 84 meters long. If a piece of 26 meters is cut off, what is the length of the remaining rope?", options: ["52 meters", "58 meters", "62 meters", "68 meters"], answer: "58 meters" },
+  { q: "A carton holds 9 packets of biscuits. If each packet contains 8 biscuits, what is the total number of biscuits in the carton?", options: ["64 biscuits", "72 biscuits", "81 biscuits", "88 biscuits"], answer: "72 biscuits" },
+  { q: "A shopkeeper has 64 bottles of juice and arranges them equally across 8 shelves. How many bottles are on each shelf?", options: ["6 bottles", "7 bottles", "8 bottles", "9 bottles"], answer: "8 bottles" },
+  { q: "Mariam has 100 stamps in her album. She gives 37 stamps to her friend. How many stamps does Mariam have now?", options: ["53 stamps", "63 stamps", "67 stamps", "73 stamps"], answer: "63 stamps" },
+  { q: "A baker bakes 240 loaves of bread in the morning and 160 loaves in the evening. How many loaves did he bake in all?", options: ["380 loaves", "390 loaves", "400 loaves", "420 loaves"], answer: "400 loaves" },
+  { q: "Saad bought 5 identical notebooks for a total of Rs. 200. What is the price of one notebook?", options: ["Rs. 35", "Rs. 40", "Rs. 45", "Rs. 50"], answer: "Rs. 40" },
+  { q: "There are 350 seats in an auditorium. If 215 seats are occupied by guests, how many seats are empty?", options: ["125 seats", "135 seats", "145 seats", "565 seats"], answer: "135 seats" },
+  { q: "An orchard has 7 rows of lemon trees. If each row contains 14 trees, how many lemon trees are there in total?", options: ["88 trees", "91 trees", "98 trees", "105 trees"], answer: "98 trees" },
+  { q: "Asim had Rs. 1,000. He paid Rs. 640 for his utility bill. How much money is left with Asim?", options: ["Rs. 340", "Rs. 360", "Rs. 440", "Rs. 460"], answer: "Rs. 360" },
+  { q: "A tailor has 54 meters of cloth. He uses 6 meters of cloth to stitch one uniform. How many complete uniforms can he make?", options: ["7 uniforms", "8 uniforms", "9 uniforms", "10 uniforms"], answer: "9 uniforms" },
+  { q: "A traveler drove 185 kilometers before lunch and 145 kilometers after lunch. What is the total distance traveled?", options: ["320 kilometers", "330 kilometers", "340 kilometers", "430 kilometers"], answer: "330 kilometers" },
+
+  // Questions 121-133: Number Sentences and Equality
+  { q: "Which pair of numbers can fill the blanks respectively to make the statement 2022 + ___ = 2020 + ___ correct?", options: ["3 and 1", "1 and 3", "2 and 2", "4 and 2"], answer: "1 and 3" },
+  { q: "Which pair of numbers can fill the blanks respectively to make the statement 15 + ___ = 12 + ___ correct?", options: ["4 and 1", "2 and 5", "5 and 2", "3 and 3"], answer: "2 and 5" },
+  { q: "Which pair of numbers can fill the blanks respectively to make the statement 50 + ___ = 40 + ___ correct?", options: ["10 and 10", "15 and 5", "5 and 15", "20 and 5"], answer: "5 and 15" },
+  { q: "Which pair of numbers can fill the blanks respectively to make the statement 100 + ___ = 90 + ___ correct?", options: ["20 and 10", "10 and 20", "15 and 15", "30 and 10"], answer: "10 and 20" },
+  { q: "Which pair of numbers can fill the blanks respectively to make the statement 35 + ___ = 38 + ___ correct?", options: ["2 and 5", "7 and 4", "4 and 7", "6 and 6"], answer: "7 and 4" },
+  { q: "Which pair of numbers can fill the blanks respectively to make the statement 500 + ___ = 490 + ___ correct?", options: ["30 and 20", "10 and 10", "20 and 30", "40 and 10"], answer: "20 and 30" },
+  { q: "Which pair of numbers can fill the blanks respectively to make the statement 25 - ___ = 20 - ___ correct?", options: ["3 and 8", "8 and 3", "5 and 5", "2 and 7"], answer: "8 and 3" },
+  { q: "Which pair of numbers can fill the blanks respectively to make the statement 40 - ___ = 30 - ___ correct?", options: ["5 and 15", "15 and 5", "10 and 10", "20 and 5"], answer: "15 and 5" },
+  { q: "Which pair of numbers can fill the blanks respectively to make the statement 14 + ___ = 20 + ___ correct?", options: ["2 and 8", "10 and 4", "4 and 10", "6 and 6"], answer: "10 and 4" },
+  { q: "Which pair of numbers can fill the blanks respectively to make the statement 1000 + ___ = 998 + ___ correct?", options: ["5 and 7", "7 and 5", "2 and 2", "6 and 3"], answer: "5 and 7" },
+  { q: "Which pair of numbers can fill the blanks respectively to make the statement 60 + ___ = 55 + ___ correct?", options: ["10 and 5", "5 and 10", "8 and 3", "4 and 4"], answer: "5 and 10" },
+  { q: "Which number can fill the blank to make the statement 45 + 25 = 50 + ___ correct?", options: ["15", "20", "25", "30"], answer: "20" },
+  { q: "Which number can fill the blank to make the statement 120 + 80 = 100 + ___ correct?", options: ["80", "90", "100", "110"], answer: "100" },
+
+  // Questions 134-149: Mixed Mathematics
+  { q: "Which operation sign correctly completes the statement 24 ___ 6 = 4?", options: ["+", "-", "x", "÷"], answer: "÷" },
+  { q: "Hamza bought 3 notebooks for Rs. 20 each and 1 pen for Rs. 15. How much total money did he spend?", options: ["Rs. 55", "Rs. 65", "Rs. 75", "Rs. 85"], answer: "Rs. 75" },
+  { q: "What is the next number in the pattern: 120, 140, 160, 180, ___?", options: ["190", "200", "210", "220"], answer: "200" },
+  { q: "A flat shape has 4 straight sides of equal length and 4 right angles. What shape is it?", options: ["Square", "Rectangle", "Rhombus", "Trapezium"], answer: "Square" },
+  { q: "Which fraction is greater than 1/2?", options: ["1/4", "1/3", "3/4", "2/5"], answer: "3/4" },
+  { q: "How many 250 ml glasses of water are needed to completely fill a 1-liter bottle?", options: ["2 glasses", "3 glasses", "4 glasses", "5 glasses"], answer: "4 glasses" },
+  { q: "A school morning assembly starts at 8:15 a.m. and finishes at 8:45 a.m. How many minutes long was the assembly?", options: ["30 minutes", "40 minutes", "45 minutes", "60 minutes"], answer: "30 minutes" },
+  { q: "What standard number is formed by 5 Thousands + 0 Hundreds + 7 Tens + 3 Ones?", options: ["573", "5037", "5073", "5703"], answer: "5073" },
+  { q: "A teacher shares 23 pencils equally among 5 students. How many pencils are left over?", options: ["1 pencil", "2 pencils", "3 pencils", "4 pencils"], answer: "3 pencils" },
+  { q: "The corner of a standard school textbook forms which type of angle?", options: ["Acute angle", "Right angle", "Obtuse angle", "Straight angle"], answer: "Right angle" },
+  { q: "In the decimal number 14.6, what is the place value of the digit 6?", options: ["6 Ones", "6 Tens", "6 Tenths", "6 Hundredths"], answer: "6 Tenths" },
+  { q: "A square garden has sides that are each 6 meters long. What is the total perimeter of the garden?", options: ["12 meters", "18 meters", "24 meters", "36 meters"], answer: "24 meters" },
+  { q: "Which of the following numbers is a common factor of both 12 and 18?", options: ["4", "5", "6", "8"], answer: "6" },
+  { q: "If Pakistan Day is celebrated on March 23, in which month of the solar year does it occur?", options: ["Second month", "Third month", "Fourth month", "Fifth month"], answer: "Third month" },
+  { q: "When any two odd numbers are added together, the resulting sum is always:", options: ["An even number", "An odd number", "A prime number", "A negative number"], answer: "An even number" },
+  { q: "A fruit basket contains 18 red apples and 12 green apples. If 10 apples are eaten, how many apples remain?", options: ["15 apples", "20 apples", "22 apples", "25 apples"], answer: "20 apples" },
+
+  // Questions 165-181: Place Value and Order of Operations
+  { q: "What standard number is formed by 7 Thousands + 0 Hundreds + 4 Tens + 9 Ones?", options: ["7,490", "7,049", "749", "7,409"], answer: "7,049" },
+  { q: "What standard number is formed by 9 Thousands + 5 Hundreds + 0 Tens + 3 Ones?", options: ["953", "9,530", "9,503", "9,053"], answer: "9,503" },
+  { q: "What standard number is formed by 2 Thousands + 8 Hundreds + 6 Tens + 0 Ones?", options: ["2,806", "286", "2,086", "2,860"], answer: "2,860" },
+  { q: "What standard number is formed by 6 Thousands + 0 Hundreds + 0 Tens + 5 Ones?", options: ["6,005", "6,050", "6,500", "65"], answer: "6,005" },
+  { q: "What standard number is formed by 3 Thousands + 7 Hundreds + 9 Tens + 1 One?", options: ["3,719", "3,791", "37,901", "3,971"], answer: "3,791" },
+  { q: "What standard number is formed by 8 Thousands + 3 Hundreds + 0 Tens + 0 Ones?", options: ["8,003", "8,030", "8,300", "830"], answer: "8,300" },
+  { q: "What standard number is formed by 1 Thousand + 9 Hundreds + 4 Tens + 7 Ones?", options: ["1,947", "1,497", "1,974", "19,047"], answer: "1,947" },
+  { q: "What standard number is formed by 5 Thousands + 0 Hundreds + 8 Tens + 0 Ones?", options: ["5,800", "580", "5,008", "5,080"], answer: "5,080" },
+  { q: "What standard number is formed by 4 Thousands + 2 Hundreds + 5 Tens + 6 Ones?", options: ["4,265", "4,256", "4,526", "42,056"], answer: "4,256" },
+  { q: "According to the order of operations, which calculation should be done first in 6 + 4 x 3?", options: ["Addition", "Multiplication", "Left-to-right order", "Subtraction"], answer: "Multiplication" },
+  { q: "Which number sentence shows the Commutative Property of Multiplication?", options: ["7 x 5 = 5 x 7", "7 x 1 = 7", "7 x (2 + 3) = 14 + 21", "7 + 0 = 7"], answer: "7 x 5 = 5 x 7" },
+  { q: "What rule is shown by the equation (3 + 8) + 2 = 3 + (8 + 2)?", options: ["Distributive Property", "Identity Property", "Associative Property of Addition", "Zero Property"], answer: "Associative Property of Addition" },
+  { q: "What is the value of 18 - (6 + 4) following the rule of parentheses?", options: ["16", "8", "20", "12"], answer: "8" },
+  { q: "Which number is the Identity Element for Addition (the number you add that leaves the value unchanged)?", options: ["10", "1", "0", "Any even number"], answer: "0" },
+  { q: "What happens when any whole number is divided by 0?", options: ["The answer is 0", "The answer is 1", "The number stays the same", "It is undefined / not allowed"], answer: "It is undefined / not allowed" },
+  { q: "Which mathematical rule states that 94 x 1 = 94?", options: ["Identity Property of Multiplication", "Zero Property", "Associative Property", "Commutative Property"], answer: "Identity Property of Multiplication" },
+  { q: "What is the correct value of 20 - 4 x 3?", options: ["48", "8", "16", "32"], answer: "8" },
+    // Page 6
+  { q: "In a leap year, which month contains 29 days instead of 28?", options: ["January", "February", "March", "April"], answer: "February" },
+  { q: "A leap year recurs regularly once every:", options: ["2 years", "3 years", "4 years", "5 years"], answer: "4 years" },
+  { q: "An exact location in space that has no length, width, or thickness is a:", options: ["Point", "Line", "Ray", "Plane"], answer: "Point" },
+  { q: "A straight geometric path that extends without end in both directions has no endpoints and is a:", options: ["Line segment", "Ray", "Line", "Angle"], answer: "Line" },
+  { q: "A straight path that has two fixed endpoints and a measurable length is a:", options: ["Line segment", "Ray", "Line", "Curve"], answer: "Line segment" },
+  { q: "A straight path that begins at one fixed endpoint and extends infinitely in one direction is a:", options: ["Line", "Line segment", "Ray", "Vertex"], answer: "Ray" },
+  { q: "Two lines in the same plane that never meet and stay the same distance apart throughout are:", options: ["Parallel lines", "Intersecting lines", "Perpendicular lines", "Curved lines"], answer: "Parallel lines" },
+  { q: "Two lines that cross or meet each other at a single common point are called:", options: ["Parallel lines", "Intersecting lines", "Ray lines", "Collinear lines"], answer: "Intersecting lines" },
+  { q: "Two lines that intersect to form an angle of exactly 90 degrees are:", options: ["Perpendicular lines", "Parallel lines", "Slanting lines", "Horizontal lines"], answer: "Perpendicular lines" },
+  { q: "Ali has 15 pencils. He gives 6 pencils to Ahmed. How many pencils are left with Ali?", options: ["7 pencils", "9 pencils", "11 pencils", "21 pencils"], answer: "9 pencils" },
+  { q: "Sara has 24 stickers. Her sister gives her 18 more stickers. How many stickers does Sara have in total?", options: ["42 stickers", "32 stickers", "40 stickers", "44 stickers"], answer: "42 stickers" },
+  { q: "Bilal had 50 rupees. He bought a notebook for 35 rupees. How many rupees are remaining with Bilal?", options: ["10 rupees", "15 rupees", "25 rupees", "85 rupees"], answer: "15 rupees" },
+  { q: "A bakery packs 6 cupcakes in one box. How many cupcakes are there in 8 such boxes?", options: ["14 cupcakes", "42 cupcakes", "48 cupcakes", "54 cupcakes"], answer: "48 cupcakes" },
+  { q: "Usman has 36 candies and shares them equally among 4 friends. How many candies does each friend get?", options: ["6 candies", "9 candies", "12 candies", "32 candies"], answer: "9 candies" },
+  { q: "A school library has 250 storybooks. If students borrow 80 storybooks, how many storybooks are left in the library?", options: ["130 storybooks", "150 storybooks", "170 storybooks", "330 storybooks"], answer: "170 storybooks" },
+
+  // Page 11
+  { q: "How many flat square faces does a standard cube have?", options: ["4 faces", "6 faces", "8 faces", "12 faces"], answer: "6 faces" },
+  { q: "A watermelon weighs 3 kilograms. What is its weight in grams?", options: ["30 grams", "300 grams", "3000 grams", "30,000 grams"], answer: "3000 grams" },
+  { q: "If 7 × ___ = 56, which number correctly fills the blank?", options: ["6", "7", "8", "9"], answer: "8" },
+  { q: "Which fraction is equivalent to 1/2?", options: ["2/3", "2/4", "3/5", "1/4"], answer: "2/4" },
+  { q: "Ali walks 400 meters to the mosque and then 600 meters to the market. What total distance did he walk?", options: ["800 meters", "1000 meters (1 km)", "1200 meters", "2000 meters"], answer: "1000 meters (1 km)" },
+  { q: "What is the number 468 rounded off to the nearest hundred?", options: ["400", "460", "470", "500"], answer: "500" },
+  { q: "Railway tracks that run side by side without ever meeting represent which type of lines?", options: ["Parallel lines", "Perpendicular lines", "Intersecting lines", "Curved lines"], answer: "Parallel lines" },
+  { q: "Amina has one Rs. 500 note and two Rs. 100 notes. How much total money does she have?", options: ["Rs. 600", "Rs. 700", "Rs. 800", "Rs. 900"], answer: "Rs. 700" },
+  { q: "In the expression 10 + 4 × 2, which operation must be calculated first according to the DMAS rule?", options: ["Addition", "Multiplication", "Subtraction", "Division"], answer: "Multiplication" },
+  { q: "When the hour hand points directly at 4 and the minute hand points directly at 12, what time is shown?", options: ["12:04", "4:12", "4:00", "4:30"], answer: "4:00" },
+  { q: "A rectangular prayer mat is 3 meters long and 2 meters wide. What is its total surface area?", options: ["5 square meters", "6 square meters", "10 square meters", "12 square meters"], answer: "6 square meters" },
+  { q: "Which of the following numbers is a multiple of 6?", options: ["16", "20", "24", "28"], answer: "24" },
+  { q: "If 4 identical ice cream cones cost Rs. 120 in total, what is the cost of 1 ice cream cone?", options: ["Rs. 20", "Rs. 25", "Rs. 30", "Rs. 35"], answer: "Rs. 30" },
+  { q: "Which English capital letter has a vertical line of symmetry?", options: ["A", "B", "C", "D"], answer: "A" },
+  { q: "What standard number is formed by 4 Thousands + 6 Hundreds + 2 Tens + 8 Ones?", options: ["4,628", "4,268", "46,028", "4,682"], answer: "4,628" }
+
+  
+];
+
+
+        let selectedQuestions = [];
+        let answeredQuestions = new Set();
+        let score = 0;
+
+        // Shuffle array and get 30 random questions
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled.slice(0, 30);
+        }
+
+        // Initialize quiz
+        function initializeQuiz() {
+            selectedQuestions = shuffleArray(allQuestions);
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+
+            selectedQuestions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.id = `question-${index}`;
+
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.textContent = `Question ${index + 1}`;
+
+                const questionText = document.createElement('div');
+                questionText.className = 'question-text';
+                questionText.textContent = question.q;
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+
+                question.options.forEach((option, optionIndex) => {
+                    const optionBtn = document.createElement('button');
+                    optionBtn.className = 'option';
+                    optionBtn.textContent = `${String.fromCharCode(65 + optionIndex)}) ${option}`;
+                    optionBtn.onclick = () => selectAnswer(index, option, optionBtn);
+                    optionsDiv.appendChild(optionBtn);
+                });
+
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result';
+                resultDiv.id = `result-${index}`;
+                resultDiv.style.display = 'none';
+
+                questionDiv.appendChild(questionNumber);
+                questionDiv.appendChild(questionText);
+                questionDiv.appendChild(optionsDiv);
+                questionDiv.appendChild(resultDiv);
+                container.appendChild(questionDiv);
+            });
+        }
+
+        // Handle answer selection
+        function selectAnswer(questionIndex, selectedAnswer, buttonElement) {
+            if (answeredQuestions.has(questionIndex)) return;
+
+            answeredQuestions.add(questionIndex);
+            const question = selectedQuestions[questionIndex];
+            const options = buttonElement.parentElement.querySelectorAll('.option');
+            const resultDiv = document.getElementById(`result-${questionIndex}`);
+
+            // Disable all options for this question
+            options.forEach(option => {
+                option.classList.add('disabled');
+                option.onclick = null;
+            });
+
+            // Show correct/incorrect styling
+            if (selectedAnswer === question.answer) {
+                buttonElement.classList.add('selected');
+                resultDiv.textContent = '✅ Correct!';
+                resultDiv.className = 'result correct';
+                score++;
+            } else {
+                buttonElement.classList.add('wrong');
+                resultDiv.textContent = `❌ Incorrect. Correct answer: ${question.answer}`;
+                resultDiv.className = 'result incorrect';
+                
+                // Highlight correct answer
+                options.forEach(option => {
+                    if (option.textContent.includes(question.answer)) {
+                        option.classList.add('selected');
+                    }
+                });
+            }
+
+            resultDiv.style.display = 'block';
+        }
+
+        // Calculate and display score
+        function calculateScore() {
+            const submitBtn = document.getElementById('submitBtn');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            
+            submitBtn.style.display = 'none';
+            
+            let message = '';
+            let emoji = '';
+            
+            if (score === 30) {
+                message = 'Perfect Score!';
+                emoji = '🏆';
+            } else if (score >= 25) {
+                message = 'Excellent!';
+                emoji = '🌟';
+            } else if (score >= 20) {
+                message = 'Good Job!';
+                emoji = '👏';
+            } else if (score >= 15) {
+                message = 'Well Done!';
+                emoji = '👍';
+            } else {
+                message = 'Keep Practicing!';
+                emoji = '📚';
+            }
+            
+            scoreDisplay.innerHTML = `
+                <div style="font-size: 1.5em; margin-bottom: 10px;">${emoji} ${message}</div>
+                <div style="font-size: 2.5em; font-weight: bold; color: #48bb78;">${score}/30</div>
+                <div class="score-text">Score: ${Math.round((score/30)*100)}%</div>
+                <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 30px; background: #667eea; color: white; border: none; border-radius: 25px; font-size: 1.1em; cursor: pointer;">Try Again</button>
+            `;
+            scoreDisplay.style.display = 'block';
+        }
+
+        // Initialize quiz on page load
+        window.onload = initializeQuiz;
+    </script>
+</body>
+</html>

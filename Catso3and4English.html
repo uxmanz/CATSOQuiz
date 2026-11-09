@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CATSO 3 and4 Grade Maths Exam Quiz</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #5a67d8;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .question {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            color: #5a67d8;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .question-text {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .option {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #cbd5e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+        
+        .option:hover:not(.disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+        
+        .option.selected {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+        }
+        
+        .option.wrong {
+            background: #f56565;
+            color: white;
+            border-color: #f56565;
+        }
+        
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .result.correct {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .result.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        #submitBtn {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 40px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #submitBtn:hover {
+            background: #38a169;
+            transform: scale(1.05);
+        }
+        
+        #scoreDisplay {
+            text-align: center;
+            font-size: 2em;
+            color: #5a67d8;
+            margin-top: 30px;
+            padding: 20px;
+            background: #e6fffa;
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .score-text {
+            font-size: 0.6em;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 CATSO 3 and 4 Grade English Quiz 🎯</h1>
+        <div id="quizContainer"></div>
+        <button id="submitBtn" onclick="calculateScore()">Submit Quiz</button>
+        <div id="scoreDisplay"></div>
+    </div>
+
+    <script>
+        // All questions data
+       // All questions data
+const allQuestions = [
+  { q: "Which of the following is an abstract noun?", options: ["Teacher", "Honesty", "Table", "River"], answer: "Honesty" },
+  { q: "Identify the collective noun: \"A _____ of keys was lying on the counter.\"", options: ["bunch", "flock", "pack", "swarm"], answer: "bunch" },
+  { q: "What is the feminine gender of the word \"Actor\"?", options: ["Actress", "Actress", "Lady actor", "Female actor"], answer: "Actress" },
+  { q: "What is the masculine gender of \"Niece\"?", options: ["Uncle", "Cousin", "Nephew", "Brother"], answer: "Nephew" },
+  { q: "Which word is an uncountable noun?", options: ["Apple", "Pen", "Milk", "Chair"], answer: "Milk" },
+  { q: "Identify the collective noun: \"A _____ of cows grazed in the meadow.\"", options: ["pride", "herd", "school", "fleet"], answer: "herd" },
+  { q: "Which of the following is a proper noun?", options: ["mountain", "country", "Islamabad", "soldier"], answer: "Islamabad" },
+  { q: "What is the feminine gender of \"Horse\"?", options: ["Cow", "Doe", "Ewe", "Mare"], answer: "Mare" },
+  { q: "Which of the following words represents a countable noun?", options: ["Sugar", "Pencil", "Water", "Salt"], answer: "Pencil" },
+  { q: "What is the abstract noun form of the adjective \"brave\"?", options: ["Bravery", "Bravely", "Braveness", "Bravement"], answer: "Bravery" },
+  { q: "Identify the collective noun for wolves:", options: ["Herd", "Flock", "Pack", "Pride"], answer: "Pack" },
+  { q: "What is the feminine gender of \"Bull\"?", options: ["Mare", "Cow", "Vixen", "Goose"], answer: "Cow" },
+  { q: "Which of the following is a material noun?", options: ["Gold", "Ring", "Finger", "Beauty"], answer: "Gold" },
+  { q: "Choose the collective noun: \"A _____ of lions was resting under the tree.\"", options: ["flock", "pack", "pride", "swarm"], answer: "pride" },
+  { q: "What is the masculine gender of \"Vixen\"?", options: ["Dog", "Drake", "Fox", "Tiger"], answer: "Fox" },
+
+  { q: "What is the plural of \"Child\"?", options: ["Childs", "Children", "Childrens", "Childer"], answer: "Children" },
+  { q: "What is the plural of \"Leaf\"?", options: ["Leafs", "Leaves", "Leavves", "Leavs"], answer: "Leaves" },
+  { q: "What is the plural form of \"Foot\"?", options: ["Feets", "Feet", "Feetes", "Footes"], answer: "Feet" },
+  { q: "What is the plural of \"City\"?", options: ["Cities", "Cities", "Citys", "Cite"], answer: "Cities" },
+  { q: "What is the plural form of \"Sheep\"?", options: ["Sheep", "Sheeps", "Sheepees", "Shoop"], answer: "Sheep" },
+  { q: "What is the plural of \"Knife\"?", options: ["Knifes", "Knives", "Kniffess", "Knife"], answer: "Knives" },
+  { q: "What is the plural of \"Tooth\"?", options: ["Tooths", "Teeth", "Teethes", "Toothes"], answer: "Teeth" },
+  { q: "What is the plural form of \"Tomato\"?", options: ["Tomatoes", "Tomatos", "Tomatose", "Tomatose"], answer: "Tomatoes" },
+  { q: "What is the plural form of \"Story\"?", options: ["Stories", "Storys", "Storys", "Storis"], answer: "Stories" },
+  { q: "What is the plural of \"Mouse\"?", options: ["Mouses", "Mice", "Mices", "Mousen"], answer: "Mice" },
+  { q: "What is the plural of \"Fish\" when referring to one species?", options: ["Fishes", "Fishes", "Fishs", "Fishe"], answer: "Fish" },
+  { q: "What is the plural of \"Life\"?", options: ["Lifes", "Lives", "Live", "Lifess"], answer: "Lives" },
+  { q: "What is the plural of \"Toy\"?", options: ["Toys", "Toies", "Toyas", "Toyz"], answer: "Toys" },
+  { q: "What is the plural of \"Woman\"?", options: ["Womans", "Women", "Womens", "Womanly"], answer: "Women" },
+  { q: "What is the plural form of \"Hero\"?", options: ["Heros", "Heroes", "Heroies", "Heroen"], answer: "Heroes" },
+  { q: "Fill in the blank: \"All hurt _____ while playing football.\"", options: ["herself", "himself", "itself", "themselves"], answer: "themselves" },
+
+  { q: "Fill in the blank: \"This pen belongs to me. It is _____.\"", options: ["mine", "my", "me", "myself"], answer: "mine" },
+  { q: "Choose the demonstrative pronoun pointing to multiple objects nearby:", options: ["This", "That", "These", "Those"], answer: "These" },
+  { q: "Fill in the blank: \"The girls cooked dinner by _____.\"", options: ["herself", "yourselves", "themselves", "theirselves"], answer: "themselves" },
+  { q: "Fill in the blank: \"Sara forgot _____ notebook at home.\"", options: ["his", "her", "its", "their"], answer: "her" },
+  { q: "Fill in the blank: \"_____ car parked across the street is very old.\"", options: ["This", "That", "These", "Them"], answer: "That" },
+  { q: "Choose the reflexive pronoun: \"I wrote this entire poem _____.\"", options: ["myself", "me", "my", "mine"], answer: "myself" },
+  { q: "Fill in the blank: \"The dog wagged _____ tail happily.\"", options: ["it's", "its", "his", "their"], answer: "its" },
+  { q: "Fill in the blank: \"This house belongs to Ahmed and Bilal. It is _____.\"", options: ["our", "their", "theirs", "them"], answer: "theirs" },
+  { q: "Fill in the blank: \"We must clean our classroom _____.\"", options: ["myself", "ourselves", "themselves", "ourself"], answer: "ourselves" },
+  { q: "Fill in the blank: \"The teacher praised Tariq and _____ for high marks.\"", options: ["me", "I", "myself", "mine"], answer: "me" },
+  { q: "Fill in the blank: \"Whose bag is this? It is _____ (belonging to you).\"", options: ["your", "yours", "you", "yourself"], answer: "yours" },
+  { q: "Which of the following is a relative pronoun?", options: ["and", "but", "who", "with"], answer: "who" },
+  { q: "Fill in the blank: \"The cat licked _____ clean after eating.\"", options: ["herself", "himself", "itself", "yourself"], answer: "itself" },
+  { q: "Fill in the blank: \"Did you complete the whole assignment by _____?\"", options: ["your", "yourself", "you", "yours"], answer: "yourself" },
+  { q: "What is the past tense of the irregular verb \"Buy\"?", options: ["Buyed", "Bought", "Brought", "Boft"], answer: "Bought" },
+  { q: "What is the past tense of \"Teach\"?", options: ["Taught", "Teach", "Thought", "Teached"], answer: "Taught" },
+
+  { q: "Fill in the blank: \"Either the boy or the girl _____ the answer.\"", options: ["know", "knows", "knowing", "are knowing"], answer: "knows" },
+  { q: "Fill in the blank: \"The sun _____ in the east.\"", options: ["rises", "rose", "rising", "rise"], answer: "rises" },
+  { q: "What is the past participle of \"Eat\"?", options: ["Ate", "Eaten", "Eten", "Eating"], answer: "Eaten" },
+  { q: "Fill in the blank: \"Yesterday, we _____ to Badshahi Mosque.\"", options: ["go", "went", "gone", "going"], answer: "went" },
+  { q: "Fill in the blank: \"Each of the students _____ a notebook.\"", options: ["has", "have", "are having", "were"], answer: "has" },
+  { q: "Fill in the blank: \"Tomorrow, my brother _____ ten years old.\"", options: ["is", "was", "will be", "were"], answer: "will be" },
+  { q: "What is the past form of \"Bring\"?", options: ["Bought", "Brought", "Bringged", "Brang"], answer: "Brought" },
+  { q: "Fill in the blank: \"Neither Ali nor his friends _____ present today.\"", options: ["is", "are", "was", "has"], answer: "are" },
+  { q: "Fill in the blank: \"They _____ cricket at the moment.\"", options: ["played", "play", "are playing", "will play"], answer: "are playing" },
+  { q: "What is the past tense of \"Write\"?", options: ["Written", "Wrote", "Writed", "Writing"], answer: "Wrote" },
+  { q: "Fill in the blank: \"She has _____ her morning homework.\"", options: ["finish", "finished", "finishes", "finishing"], answer: "finished" },
+  { q: "What is the past tense of \"Fly\"?", options: ["Flew", "Flown", "Flyed", "Flowed"], answer: "Flew" },
+  { q: "Fill in the blank: \"The team of players _____ practicing hard.\"", options: ["is", "are", "were", "have"], answer: "is" },
+  { q: "What is the past tense of \"Catch\"?", options: ["Catched", "Caught", "Chaught", "Cot"], answer: "Caught" },
+  { q: "Fill in the blank: \"Water _____ at 100 degrees Celsius.\"", options: ["boil", "boils", "boiled", "boiling"], answer: "boils" },
+  { q: "What is the past tense of \"Swim\"?", options: ["Swam", "Swimmed", "Swimmed", "Sweem"], answer: "Swam" },
+
+  { q: "Fill in the blank: \"The bell _____ before we reached the class.\"", options: ["ring", "rang", "had rung", "ringing"], answer: "had rung" },
+  { q: "Fill in the blank: \"He _____ television when his mother called.\"", options: ["watch", "watched", "was watching", "is watching"], answer: "was watching" },
+  { q: "Fill in the blank: \"_____ I come in, teacher?\"", options: ["Must", "May", "Should", "Would"], answer: "May" },
+  { q: "Fill in the blank: \"You _____ respect your parents and elders.\"", options: ["should", "can", "might", "could"], answer: "should" },
+  { q: "Fill in the blank: \"Cars _____ stop when the traffic light is red.\"", options: ["might", "can", "must", "could"], answer: "must" },
+  { q: "Fill in the blank: \"Fish _____ swim in the river.\"", options: ["can", "must", "should", "might"], answer: "can" },
+  { q: "Fill in the blank: \"It is cloudy; it _____ rain this evening.\"", options: ["can", "may", "shall", "will"], answer: "may" },
+  { q: "Fill in the blank: \"Students _____ not make noise in the library.\"", options: ["could", "must", "may", "might"], answer: "must" },
+  { q: "Fill in the blank: \"_____ you please pass me the salt?\"", options: ["May", "Could", "Must", "Shall"], answer: "Could" },
+  { q: "Fill in the blank: \"We _____ brush our teeth twice a day.\"", options: ["should", "may", "might", "could"], answer: "should" },
+  { q: "Fill in the blank: \"He is strong; he _____ lift this heavy box.\"", options: ["must", "should", "can", "may"], answer: "can" },
+  { q: "Fill in the blank: \"You _____ wash your hands before eating.\"", options: ["can", "must", "might", "may"], answer: "must" },
+
+  { q: "What is the comparative degree of \"Tall\"?", options: ["More tall", "Taller", "Tallest", "Most tall"], answer: "Taller" },
+  { q: "What is the superlative degree of \"Good\"?", options: ["Better", "Gooder", "Best", "Goodest"], answer: "Best" },
+  { q: "What is the comparative degree of \"Beautiful\"?", options: ["More beautiful", "Beautifuler", "Most beautiful", "Beautifuller"], answer: "More beautiful" },
+  { q: "Fill in the blank: \"K2 is the second _____ peak on Earth.\"", options: ["high", "higher", "highest", "most high"], answer: "highest" },
+  { q: "Fill in the blank: \"Iron is _____ than wood.\"", options: ["heavy", "heavier", "heaviest", "more heavy"], answer: "heavier" },
+  { q: "What is the comparative degree of \"Bad\"?", options: ["Badder", "Worse", "Worst", "Baddest"], answer: "Worse" },
+  { q: "What is the superlative degree of \"Little\" (amount)?", options: ["Littlest", "Less", "Least", "Lesser"], answer: "Least" },
+  { q: "What is the comparative degree of \"Easy\"?", options: ["Easier", "More easy", "Easiest", "Easyer"], answer: "Easier" },
+  { q: "Fill in the blank: \"Mount Everest is the _____ mountain in the world.\"", options: ["higher", "highest", "high", "height"], answer: "highest" },
+  { q: "Fill in the blank: \"An aeroplane is _____ than a train.\"", options: ["fast", "faster", "fastest", "most fast"], answer: "faster" },
+  { q: "What is the superlative degree of \"Hot\"?", options: ["Hoter", "More hot", "Hottest", "Most hot"], answer: "Hottest" },
+  { q: "What is the comparative degree of \"Much / Many\"?", options: ["More", "Most", "Manyer", "Mucher"], answer: "More" },
+  { q: "Fill in the blank: \"This riddle is _____ than the first one.\"", options: ["difficult", "more difficult", "most difficult", "difficulter"], answer: "more difficult" },
+  { q: "What is the superlative degree of \"Clever\"?", options: ["More clever", "Cleverer", "Cleverest", "Most cleverest"], answer: "Cleverest" },
+  { q: "Fill in the blank: \"Health is _____ than wealth.\"", options: ["important", "more important", "most important", "importanter"], answer: "more important" },
+  { q: "Identify the adverb of manner in: \"The tortoise walked slowly.\"", options: ["The", "tortoise", "walked", "slowly"], answer: "slowly" },
+  { q: "Identify the adverb of place in: \"Come inside now.\"", options: ["Come", "inside", "now", "the"], answer: "inside" },
+  { q: "Identify the adverb of time in: \"We will leave for Murree tomorrow.\"", options: ["leave", "Murree", "tomorrow", "will"], answer: "tomorrow" },
+  { q: "Which word is an adverb of frequency?", options: ["Quietly", "Always", "There", "Today"], answer: "Always" },
+  { q: "In the sentence \"The soldier fought bravely,\" the word \"bravely\" is an:", options: ["Adjective", "Noun", "Adverb", "Verb"], answer: "Adverb" },
+
+  { q: "Choose the adverb in: \"He solved the math puzzle easily.\"", options: ["He", "solved", "puzzle", "easily"], answer: "easily" },
+  { q: "Fill in the blank: \"She sings _____.\"", options: ["sweetly", "sweet", "sweetness", "sweetest"], answer: "sweetly" },
+  { q: "Which sentence contains an adverb of place?", options: ["He ran quickly.", "The children played outside.", "She woke early.", "He eats twice daily."], answer: "The children played outside." },
+  { q: "In \"He seldom makes a mistake,\" the word \"seldom\" tells us:", options: ["How", "Where", "How often", "When"], answer: "How often" },
+  { q: "What is the adverb form of the adjective \"quick\"?", options: ["Quicker", "Quickly", "Quickest", "Quickness"], answer: "Quickly" },
+  { q: "Fill in the blank: \"Mr. Ahmad is _____ honest police officer.\"", options: ["a", "an", "the", "two"], answer: "an" },
+  { q: "Fill in the blank: \"_____ Indus River is the longest river in Pakistan.\"", options: ["A", "An", "The", "Any"], answer: "The" },
+  { q: "Fill in the blank: \"He will arrive in _____ hour.\"", options: ["a", "an", "the", "few"], answer: "an" },
+  { q: "Fill in the blank: \"This is _____ European country.\"", options: ["a", "an", "the", "these"], answer: "a" },
+  { q: "Fill in the blank: \"_____ Holy Quran is the last book of Allah.\"", options: ["A", "An", "The", "That"], answer: "The" },
+  { q: "Fill in the blank: \"She wears _____ uniform to school.\"", options: ["a", "an", "these", "those"], answer: "a" },
+  { q: "Fill in the blank: \"I have _____ good news for you.\"", options: ["a", "an", "some", "many"], answer: "some" },
+  { q: "Fill in the blank: \"There isn't _____ milk left in the bottle.\"", options: ["some", "any", "many", "a"], answer: "any" },
+  { q: "Fill in the blank: \"How _____ apples did you buy from the market?\"", options: ["many", "much", "little", "any"], answer: "many" },
+  { q: "Fill in the blank: \"How _____ sugar do you need in your tea?\"", options: ["many", "much", "few", "a few"], answer: "much" },
+
+  { q: "Fill in the blank: \"Our annual exams start _____ Monday.\"", options: ["in", "at", "on", "by"], answer: "on" },
+  { q: "Fill in the blank: \"The school assembly begins _____ 8:00 AM.\"", options: ["on", "at", "in", "to"], answer: "at" },
+  { q: "Fill in the blank: \"Pakistan gained independence _____ 1947.\"", options: ["in", "on", "at", "during"], answer: "in" },
+  { q: "Fill in the blank: \"Distribute these sweets _____ the two sisters.\"", options: ["among", "between", "through", "with"], answer: "between" },
+  { q: "Fill in the blank: \"Distribute the prizes _____ all the class winners.\"", options: ["among", "between", "into", "along"], answer: "among" },
+  { q: "Fill in the blank: \"The frog jumped _____ the pond.\"", options: ["in", "into", "on", "over"], answer: "into" },
+  { q: "Fill in the blank: \"He has been absent _____ last Monday.\"", options: ["since", "for", "from", "at"], answer: "since" },
+  { q: "Fill in the blank: \"She waited at the bus stop _____ two hours.\"", options: ["since", "for", "on", "by"], answer: "for" },
+  { q: "Fill in the blank: \"The cat jumped _____ the low fence.\"", options: ["through", "over", "under", "between"], answer: "over" },
+  { q: "Fill in the blank: \"They walked _____ the river bank.\"", options: ["along", "in", "into", "across"], answer: "along" },
+  { q: "Fill in the blank: \"The train passed _____ the long tunnel.\"", options: ["across", "through", "along", "into"], answer: "through" },
+  { q: "Fill in the blank: \"She is good _____ English grammar.\"", options: ["in", "at", "on", "with"], answer: "at" },
+  { q: "Fill in the blank: \"The airplane flew _____ the thick clouds.\"", options: ["under", "above", "into", "onto"], answer: "above" },
+  { q: "Fill in the blank: \"We celebrate Pakistan Day _____ March 23rd.\"", options: ["in", "on", "at", "for"], answer: "on" },
+  { q: "Fill in the blank: \"He sat _____ his father in the front row.\"", options: ["along", "beside", "besides", "among"], answer: "beside" },
+  { q: "Fill in the blank: \"He ran fast, _____ he missed the school bus.\"", options: ["and", "but", "or", "so"], answer: "but" },
+
+  { q: "Fill in the blank: \"You must study hard _____ you will fail the test.\"", options: ["and", "but", "or", "so"], answer: "or" },
+  { q: "Fill in the blank: \"Ali went to bed early _____ he was very tired.\"", options: ["because", "so", "but", "although"], answer: "because" },
+  { q: "Fill in the blank: \"It was raining outside, _____ we stayed indoors.\"", options: ["because", "so", "but", "or"], answer: "so" },
+  { q: "Fill in the blank: \"Would you like tea _____ cold juice?\"", options: ["and", "or", "but", "so"], answer: "or" },
+  { q: "Fill in the blank: \"_____ he is poor, he is very honest.\"", options: ["Although", "Because", "Since", "So"], answer: "Although" },
+  { q: "Fill in the blank: \"Wait here _____ I return.\"", options: ["because", "until", "so", "unless"], answer: "until" },
+  { q: "Fill in the blank: \"You cannot enter the room _____ you have a pass.\"", options: ["unless", "because", "so", "although"], answer: "unless" },
+  { q: "Fill in the blank: \"Sara packed her bag _____ zipped it shut.\"", options: ["and", "but", "or", "yet"], answer: "and" },
+  { q: "Fill in the blank: \"He worked hard _____ he could pass the examination.\"", options: ["although", "because", "so that", "unless"], answer: "so that" },
+  { q: "Which sentence is an interrogative sentence?", options: ["Stop making noise.", "What a lovely flower!", "Have you finished lunch?", "I like painting."], answer: "Have you finished lunch?" },
+  { q: "Which sentence is an imperative sentence (command/request)?", options: ["Please pass the water bottle.", "The weather is warm.", "Where are you going?", "Hurrah, we won!"], answer: "Please pass the water bottle." },
+  { q: "Which sentence is an exclamatory sentence?", options: ["It is very hot today.", "What a brilliant goal that was!", "Do you play soccer?", "Clean your desk now."], answer: "What a brilliant goal that was!" },
+  { q: "Identify the subject in: \"The clever crow dropped pebbles into the pitcher.\"", options: ["The clever crow", "dropped", "pebbles", "the pitcher"], answer: "The clever crow" },
+  { q: "Identify the predicate in: \"My sister painted a scenery.\"", options: ["My sister", "painted a scenery", "scenery", "sister painted"], answer: "painted a scenery" },
+
+  { q: "Choose the correctly punctuated sentence:", options: ["Wow what a nice dress", "Wow! What a nice dress.", "Wow? What a nice dress!", "Wow what a nice dress!"], answer: "Wow! What a nice dress." },
+  { q: "Choose the sentence with the correct possessive apostrophe:", options: ["This is my teacher's pen.", "This is my teachers' pen.", "This is my teachers pen.", "This is my teacher pen's."], answer: "This is my teacher's pen." },
+  { q: "Which word in the following sentence needs a capital letter? \"We visited murree last june.\"", options: ["visited", "murree", "last", "june"], answer: "murree" },
+  { q: "What mark should end this sentence: \"Could you tell me the time\"", options: [".", "?", "!", ","], answer: "?" },
+  { q: "What is the contraction form of \"do not\"?", options: ["don't", "dont'", "do'nt", "dont"], answer: "don't" },
+  { q: "What is the contraction form of \"will not\"?", options: ["willn't", "win't", "won't", "wouldn't"], answer: "won't" },
+  { q: "What does the contraction \"they're\" stand for?", options: ["there is", "their", "they are", "they were"], answer: "they are" },
+  { q: "Choose the correct punctuation for the list:", options: ["We bought apples, oranges, grapes, and figs.", "We bought apples oranges grapes and figs.", "We bought apples; oranges; grapes; and figs.", "We bought, apples oranges grapes, and figs."], answer: "We bought apples, oranges, grapes, and figs." },
+  { q: "Identify the compound sentence:", options: ["He plays football every day.", "He studied hard, yet he failed.", "Eating healthy food is good.", "To win the prize was his goal."], answer: "He studied hard, yet he failed." },
+  { q: "Which sentence shows the correct use of quotation marks?", options: ["\"Ali said I am happy.\"", "Ali said, \"I am happy.\"", "Ali said \"I am happy\".", "Ali said, I am happy."], answer: "Ali said, \"I am happy.\"" },
+  { q: "What is the antonym of \"Generous\"?", options: ["Kind", "Stingy", "Helpful", "Polite"], answer: "Stingy" },
+  { q: "What is the synonym of \"Huge\"?", options: ["Enormous", "Tiny", "Narrow", "Light"], answer: "Enormous" },
+
+  { q: "What prefix can be added to \"happy\" to mean the opposite?", options: ["dis-", "in-", "un-", "im-"], answer: "un-" },
+  { q: "What suffix turns the root word \"care\" into an adjective meaning \"without care\"?", options: ["-ful", "-less", "-ness", "-ly"], answer: "-less" },
+  { q: "What is the antonym of \"Ancient\"?", options: ["Old", "Modern", "Past", "Historic"], answer: "Modern" },
+  { q: "What is the synonym of \"Silent\"?", options: ["Quiet", "Noisy", "Rapid", "Bright"], answer: "Quiet" },
+  { q: "What prefix added to \"possible\" makes its antonym?", options: ["un-", "dis-", "im-", "in-"], answer: "im-" },
+  { q: "What suffix turns the verb \"teach\" into a noun for a person?", options: ["-er", "-or", "-ist", "-ant"], answer: "-er" },
+  { q: "What is the antonym of \"Victory\"?", options: ["Success", "Win", "Defeat", "Pride"], answer: "Defeat" },
+  { q: "What is the synonym of \"Rapid\"?", options: ["Slow", "Dull", "Fast", "Heavy"], answer: "Fast" },
+  { q: "What prefix turns \"agree\" into its opposite?", options: ["un-", "dis-", "in-", "mis-"], answer: "dis-" },
+  { q: "What suffix is added to \"kind\" to create an abstract noun?", options: ["-ly", "-ful", "-ness", "-able"], answer: "-ness" },
+  { q: "What is the antonym of \"Dangerous\"?", options: ["Safe", "Harmful", "Risky", "Wild"], answer: "Safe" },
+  { q: "What is the synonym of \"Difficult\"?", options: ["Simple", "Hard", "Easy", "Plain"], answer: "Hard" },
+  { q: "What prefix added to \"behave\" means \"to behave badly\"?", options: ["un-", "dis-", "mis-", "re-"], answer: "mis-" },
+  { q: "Fill in the blank: \"The bird built _____ nest on the branch.\"", options: ["there", "its", "it's", "their"], answer: "its" },
+  { q: "Fill in the blank: \"I can _____ the ringing of school bells.\"", options: ["hear", "here", "hair", "hare"], answer: "hear" },
+
+  { q: "Fill in the blank: \"The wind _____ away the dry leaves.\"", options: ["blue", "blew", "blown", "blowed"], answer: "blew" },
+  { q: "Which word is spelled correctly?", options: ["Recieve", "Receive", "Receeve", "Rceive"], answer: "Receive" },
+  { q: "Fill in the blank: \"We have seven days in one _____.\"", options: ["weak", "week", "wake", "wick"], answer: "week" },
+  { q: "Which word is spelled correctly?", options: ["Beautifull", "Beautiful", "Baeutifull", "Beutiful"], answer: "Beautiful" },
+  { q: "Fill in the blank: \"He wrote a letter with a pen on white _____.\"", options: ["paper", "pepper", "piper", "pauper"], answer: "paper" },
+  { q: "Which word means \"not allowed to be seen or discovered\"?", options: ["Public", "Secret", "Clear", "Plain"], answer: "Secret" },
+  { q: "Fill in the blank: \"The boat sailed across the blue _____.\"", options: ["see", "sea", "cee", "sei"], answer: "sea" },
+  { q: "Which word is spelled correctly?", options: ["Library", "Librery", "Library", "Librery"], answer: "Library" },
+  { q: "Fill in the blank: \"The animal that looks like a large rabbit is known as a _____.\"", options: ["hair", "hare", "heir", "hear"], answer: "hare" },
+  { q: "Which word is an anagram of \"EARTH\"?", options: ["HEART", "HEARD", "TRAIN", "HEATH"], answer: "HEART" },
+  { q: "Fill in the blank: \"The baker baked a fresh loaf of _____.\"", options: ["bred", "bread", "braid", "brad"], answer: "bread" },
+  { q: "Which word is spelled correctly?", options: ["Tomorrow", "Tommorow", "Tomorrow", "To-morrow"], answer: "Tomorrow" },
+  { q: "Fill in the blank: \"He is the rightful _____ to the kingdom.\"", options: ["hair", "hare", "heir", "here"], answer: "heir" }
+];
+
+
+        let selectedQuestions = [];
+        let answeredQuestions = new Set();
+        let score = 0;
+
+        // Shuffle array and get 30 random questions
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled.slice(0, 30);
+        }
+
+        // Initialize quiz
+        function initializeQuiz() {
+            selectedQuestions = shuffleArray(allQuestions);
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+
+            selectedQuestions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.id = `question-${index}`;
+
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.textContent = `Question ${index + 1}`;
+
+                const questionText = document.createElement('div');
+                questionText.className = 'question-text';
+                questionText.textContent = question.q;
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+
+                question.options.forEach((option, optionIndex) => {
+                    const optionBtn = document.createElement('button');
+                    optionBtn.className = 'option';
+                    optionBtn.textContent = `${String.fromCharCode(65 + optionIndex)}) ${option}`;
+                    optionBtn.onclick = () => selectAnswer(index, option, optionBtn);
+                    optionsDiv.appendChild(optionBtn);
+                });
+
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result';
+                resultDiv.id = `result-${index}`;
+                resultDiv.style.display = 'none';
+
+                questionDiv.appendChild(questionNumber);
+                questionDiv.appendChild(questionText);
+                questionDiv.appendChild(optionsDiv);
+                questionDiv.appendChild(resultDiv);
+                container.appendChild(questionDiv);
+            });
+        }
+
+        // Handle answer selection
+        function selectAnswer(questionIndex, selectedAnswer, buttonElement) {
+            if (answeredQuestions.has(questionIndex)) return;
+
+            answeredQuestions.add(questionIndex);
+            const question = selectedQuestions[questionIndex];
+            const options = buttonElement.parentElement.querySelectorAll('.option');
+            const resultDiv = document.getElementById(`result-${questionIndex}`);
+
+            // Disable all options for this question
+            options.forEach(option => {
+                option.classList.add('disabled');
+                option.onclick = null;
+            });
+
+            // Show correct/incorrect styling
+            if (selectedAnswer === question.answer) {
+                buttonElement.classList.add('selected');
+                resultDiv.textContent = '✅ Correct!';
+                resultDiv.className = 'result correct';
+                score++;
+            } else {
+                buttonElement.classList.add('wrong');
+                resultDiv.textContent = `❌ Incorrect. Correct answer: ${question.answer}`;
+                resultDiv.className = 'result incorrect';
+                
+                // Highlight correct answer
+                options.forEach(option => {
+                    if (option.textContent.includes(question.answer)) {
+                        option.classList.add('selected');
+                    }
+                });
+            }
+
+            resultDiv.style.display = 'block';
+        }
+
+        // Calculate and display score
+        function calculateScore() {
+            const submitBtn = document.getElementById('submitBtn');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            
+            submitBtn.style.display = 'none';
+            
+            let message = '';
+            let emoji = '';
+            
+            if (score === 30) {
+                message = 'Perfect Score!';
+                emoji = '🏆';
+            } else if (score >= 25) {
+                message = 'Excellent!';
+                emoji = '🌟';
+            } else if (score >= 20) {
+                message = 'Good Job!';
+                emoji = '👏';
+            } else if (score >= 15) {
+                message = 'Well Done!';
+                emoji = '👍';
+            } else {
+                message = 'Keep Practicing!';
+                emoji = '📚';
+            }
+            
+            scoreDisplay.innerHTML = `
+                <div style="font-size: 1.5em; margin-bottom: 10px;">${emoji} ${message}</div>
+                <div style="font-size: 2.5em; font-weight: bold; color: #48bb78;">${score}/30</div>
+                <div class="score-text">Score: ${Math.round((score/30)*100)}%</div>
+                <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 30px; background: #667eea; color: white; border: none; border-radius: 25px; font-size: 1.1em; cursor: pointer;">Try Again</button>
+            `;
+            scoreDisplay.style.display = 'block';
+        }
+
+        // Initialize quiz on page load
+        window.onload = initializeQuiz;
+    </script>
+</body>
+</html>
